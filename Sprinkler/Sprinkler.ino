@@ -45,19 +45,54 @@ unsigned char security_passphrase_len;
 
 // This is our page serving function that generates web pages
 boolean sendMyPage(char* URL) {
-
+    char *pin = strtok(URL,"/");
+    char *value = strtok(NULL,"/");
+    
+    
   // Check if the requested URL matches "/"
-  if (strcmp(URL, "/") == 0) {
+  //if (strcmp(URL, "/") == 0) {
     // Use WiServer's print and println functions to write out the page content
     WiServer.print("<html>");
     WiServer.print("Hello World!");
+    WiServer.print("<br/>");
+    WiServer.print(URL);
+    WiServer.print("<br/>");
+    WiServer.print(pin);
+    WiServer.print("<br/>");
+    
+    if(value!=NULL)
+    {
+      WiServer.print(value);
+      int selectedPin = atoi (pin);
+      pinMode(selectedPin, OUTPUT);
+      if(strncmp(value, "HIGH", 4) == 0 || strncmp(value, "LOW", 3) == 0)
+      {
+        //Digial HIGH/LOW
+        if(strncmp(value, "HIGH", 4) == 0)
+        {
+          digitalWrite(selectedPin, HIGH);
+        }
+        if(strncmp(value, "LOW", 4) == 0)
+        {
+          digitalWrite(selectedPin, LOW);
+        }
+      }
+      else
+      {
+        //Analog
+        int selectedValue = atoi(value);
+        analogWrite(selectedPin, selectedValue);
+      }
+      
+    }
+    
     WiServer.print("</html>");
 
     // URL was recognized
     return true;
-  }
+  //}
   // URL not found
-  return false;
+  //return false;
 }
 
 
