@@ -53,8 +53,6 @@ boolean sendMyPage(char* URL) {
   //if (strcmp(URL, "/") == 0) {
     // Use WiServer's print and println functions to write out the page content
     WiServer.print("<html>");
-    WiServer.print("Hello World!");
-    WiServer.print("<br/>");
     WiServer.print(URL);
     WiServer.print("<br/>");
     WiServer.print(pin);
