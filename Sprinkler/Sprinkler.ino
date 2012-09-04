@@ -63,14 +63,14 @@ boolean sendMyPage(char* URL) {
       WiServer.print(value);
       int selectedPin = atoi (pin);
       pinMode(selectedPin, OUTPUT);
-      if(strncmp(value, "HIGH", 4) == 0 || strncmp(value, "LOW", 3) == 0)
+      if(strncmp(value, "ON", 4) == 0 || strncmp(value, "OFF", 3) == 0)
       {
         //Digial HIGH/LOW
-        if(strncmp(value, "HIGH", 4) == 0)
+        if(strncmp(value, "ON", 4) == 0)
         {
           digitalWrite(selectedPin, HIGH);
         }
-        if(strncmp(value, "LOW", 4) == 0)
+        if(strncmp(value, "OFF", 4) == 0)
         {
           digitalWrite(selectedPin, LOW);
         }
