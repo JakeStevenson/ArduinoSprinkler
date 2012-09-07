@@ -1,6 +1,8 @@
 /*
  * My simple http-based sprinkler control
  * 4-zones on sprinkler correspond to pins 4-7
+ * Because of my relay-- a LOW signal to the pin actually turns ON the sprinkler,
+ *   so ON/OFF might be backward of what is expected
  */
 
 
@@ -53,14 +55,14 @@ boolean sendMyPage(char* URL) {
     if(value!=NULL)
     {
       pinMode(selectedPin, OUTPUT);
-      if(strncmp(value, "ON", 4) == 0 || strncmp(value, "OFF", 3) == 0)
+      if(strncmp(value, "OFF", 4) == 0 || strncmp(value, "ON", 3) == 0)
       {
         //Digial HIGH/LOW
-        if(strncmp(value, "ON", 4) == 0)
+        if(strncmp(value, "OFF", 4) == 0)
         {
           digitalWrite(selectedPin, HIGH);
         }
-        if(strncmp(value, "OFF", 4) == 0)
+        if(strncmp(value, "ON", 4) == 0)
         {
           digitalWrite(selectedPin, LOW);
         }
@@ -69,17 +71,21 @@ boolean sendMyPage(char* URL) {
     }
     else
     {
-      //Send back value
-      pinMode(selectedPin, INPUT);
-      int inValue = digitalRead(selectedPin);
-
-              if(inValue == 0){
-                WiServer.print("OFF");
-              }
-
-              if(inValue == 1){
-                WiServer.print("ON");
-              }
+      if(strncmp(zone, "ALL", 4) == 0)
+      {
+        WiServer.print('[');
+        for(int checkPin = 4; checkPin < 7; checkPin++)
+          {
+            jsonPin(checkPin);
+            WiServer.print("],[");
+          }
+        jsonPin(7);
+        WiServer.print(']');
+      }
+      else
+      {
+        jsonPin(selectedPin);
+      }
     }
 
     // URL was recognized
@@ -89,8 +95,37 @@ boolean sendMyPage(char* URL) {
   //return false;
 }
 
+void jsonPin(int selectedPin)
+{
+  int zone = selectedPin-3;
+  WiServer.print("{'zone");
+  WiServer.print(zone);
+  WiServer.print("':");
+  readPin(selectedPin);
+  WiServer.print('}');
+}
+
+void readPin(int selectedPin)
+{
+  //Send back single value
+  pinMode(selectedPin, INPUT);
+  int inValue = digitalRead(selectedPin);
+
+  if(inValue == 0){
+    WiServer.print("1");
+  }
+
+  if(inValue == 1){
+    WiServer.print("0");
+  }
+}
 
 void setup() {
+  for(int selectedPin = 4; selectedPin <= 7; selectedPin++) 
+  {
+    pinMode(selectedPin, OUTPUT);
+    digitalWrite(selectedPin, HIGH);
+  }
   // Initialize WiServer and have it use the sendMyPage function to serve pages
   WiServer.init(sendMyPage);
 
