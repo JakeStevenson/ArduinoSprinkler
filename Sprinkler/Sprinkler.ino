@@ -1,5 +1,6 @@
 /*
- * A simple sketch that uses WiServer to serve a web page
+ * My simple http-based sprinkler control
+ * 4-zones on sprinkler correspond to pins 4-7
  */
 
 
@@ -45,23 +46,12 @@ unsigned char security_passphrase_len;
 
 // This is our page serving function that generates web pages
 boolean sendMyPage(char* URL) {
-    char *pin = strtok(URL,"/");
+    char *zone = strtok(URL,"/");
     char *value = strtok(NULL,"/");
-    
-    
-  // Check if the requested URL matches "/"
-  //if (strcmp(URL, "/") == 0) {
-    // Use WiServer's print and println functions to write out the page content
-    WiServer.print("<html>");
-    WiServer.print(URL);
-    WiServer.print("<br/>");
-    WiServer.print(pin);
-    WiServer.print("<br/>");
+    int selectedPin = atoi (zone)+3; //Our zones are 1-4, but on pins 4-7
     
     if(value!=NULL)
     {
-      WiServer.print(value);
-      int selectedPin = atoi (pin);
       pinMode(selectedPin, OUTPUT);
       if(strncmp(value, "ON", 4) == 0 || strncmp(value, "OFF", 3) == 0)
       {
@@ -75,16 +65,22 @@ boolean sendMyPage(char* URL) {
           digitalWrite(selectedPin, LOW);
         }
       }
-      else
-      {
-        //Analog
-        int selectedValue = atoi(value);
-        analogWrite(selectedPin, selectedValue);
-      }
-      
+      WiServer.print("OK");
     }
-    
-    WiServer.print("</html>");
+    else
+    {
+      //Send back value
+      pinMode(selectedPin, INPUT);
+      int inValue = digitalRead(selectedPin);
+
+              if(inValue == 0){
+                WiServer.print("OFF");
+              }
+
+              if(inValue == 1){
+                WiServer.print("ON");
+              }
+    }
 
     // URL was recognized
     return true;
