@@ -54,9 +54,9 @@ boolean sendMyPage(char* URL) {
     
     if(value!=NULL)
     {
-      pinMode(selectedPin, OUTPUT);
       if(strncmp(value, "OFF", 4) == 0 || strncmp(value, "ON", 3) == 0)
       {
+        Serial.println("writing   pin");
         //Digial HIGH/LOW
         if(strncmp(value, "OFF", 4) == 0)
         {
@@ -67,7 +67,7 @@ boolean sendMyPage(char* URL) {
           digitalWrite(selectedPin, LOW);
         }
       }
-      WiServer.print("OK");
+      jsonPin(selectedPin);
     }
     else
     {
@@ -107,10 +107,11 @@ void jsonPin(int selectedPin)
 
 void readPin(int selectedPin)
 {
+  Serial.println("reading pin");
   //Send back single value
-  pinMode(selectedPin, INPUT);
-  int inValue = digitalRead(selectedPin);
-
+  int inValue = bitRead(PORTD, selectedPin);
+  Serial.println(inValue);
+  
   if(inValue == 0){
     WiServer.print("1");
   }
@@ -121,6 +122,7 @@ void readPin(int selectedPin)
 }
 
 void setup() {
+  Serial.begin(9600);
   for(int selectedPin = 4; selectedPin <= 7; selectedPin++) 
   {
     pinMode(selectedPin, OUTPUT);
@@ -130,7 +132,6 @@ void setup() {
   WiServer.init(sendMyPage);
 
   // Enable Serial output and ask WiServer to generate log messages (optional)
-  Serial.begin(57600);
   WiServer.enableVerboseMode(true);
 }
 
@@ -141,5 +142,6 @@ void loop(){
 
   delay(10);
 }
+
 
 
