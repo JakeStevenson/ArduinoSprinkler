@@ -64,6 +64,8 @@ boolean sendMyPage(char* URL) {
         }
         if(strncmp(value, "ON", 4) == 0)
         {
+          //First make sure all other zones are off.
+          allOff();
           digitalWrite(selectedPin, LOW);
         }
       }
@@ -123,16 +125,21 @@ void readPin(int selectedPin)
 
 void setup() {
   Serial.begin(9600);
-  for(int selectedPin = 4; selectedPin <= 7; selectedPin++) 
-  {
-    pinMode(selectedPin, OUTPUT);
-    digitalWrite(selectedPin, HIGH);
-  }
+  allOff();
   // Initialize WiServer and have it use the sendMyPage function to serve pages
   WiServer.init(sendMyPage);
 
   // Enable Serial output and ask WiServer to generate log messages (optional)
   WiServer.enableVerboseMode(true);
+}
+
+void allOff()
+{
+  for(int selectedPin = 4; selectedPin <= 7; selectedPin++) 
+  {
+    pinMode(selectedPin, OUTPUT);
+    digitalWrite(selectedPin, LOW);
+  }
 }
 
 void loop(){
