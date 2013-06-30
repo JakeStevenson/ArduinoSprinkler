@@ -21,7 +21,7 @@ unsigned char subnet_mask[] = {
 const prog_char ssid[] PROGMEM = {
   "REDACTED"};		// max 32 bytes
 
-unsigned char security_type = 3;	// 0 - open; 1 - WEP; 2 - WPA; 3 - WPA2
+unsigned char security_type = 2;	// 0 - open; 1 - WEP; 2 - WPA; 3 - WPA2
 
 // WPA/WPA2 passphrase
 const prog_char security_passphrase[] PROGMEM = {
