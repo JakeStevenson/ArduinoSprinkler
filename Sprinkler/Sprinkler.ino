@@ -60,13 +60,13 @@ boolean sendMyPage(char* URL) {
         //Digial HIGH/LOW
         if(strncmp(value, "OFF", 4) == 0)
         {
-          digitalWrite(selectedPin, HIGH);
+          digitalWrite(selectedPin, LOW);
         }
         if(strncmp(value, "ON", 4) == 0)
         {
           //First make sure all other zones are off.
           allOff();
-          digitalWrite(selectedPin, LOW);
+          digitalWrite(selectedPin, HIGH);
         }
       }
       jsonPin(selectedPin);
