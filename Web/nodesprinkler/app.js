@@ -6,16 +6,18 @@ var 	http = require("http"),
 
 
 function onRequest(request, response){
-	callback = function(response){
+	callback = function(callresponse){
 		var str = '';
 		//another chunk of data has been recieved, so append it to `str`
-		response.on('data', function (chunk) {
+		callresponse.on('data', function (chunk) {
 		  str += chunk;
 		});
 
 		//the whole response has been recieved, so we just print it out here
-		response.on('end', function () {
+		callresponse.on('end', function () {
 		  console.log(str);
+		  response.write(str);
+		  response.end();
 		});
 
 	};
@@ -32,10 +34,6 @@ function onRequest(request, response){
 			path: uri
 		}
 		http.request(options, callback).end();	
-		console.log("not exists: " + filename);
-		response.writeHead(200, {'Content-Type': 'text/plain'});
-		response.write('404 Not Found\n');
-		response.end();
 		return;
 		}
 	else{

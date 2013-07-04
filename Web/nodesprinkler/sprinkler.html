@@ -11,13 +11,23 @@
 
 				$("#all").click(function(){
 					callZone('1', 'ON');
-					callZone('2', 'ON');
-					callZone('3', 'ON');
-					callZone('4', 'ON');
+					window.setTimeout(function(){
+						callZone('2', 'ON');
+						window.setTimeout(function(){
+							callZone('3', 'ON');
+							window.setTimeout(function(){
+								callZone('4', 'ON');
+							}, 10000);
+						}, 10000);
+					}, 10000);
 				});
 
 				$(".zoneButton").click(function(){
 					var zone = $(this).val();
+					if($(this).hasClass("turnedON")){
+						callZone(zone, 'OFF');
+						return;
+					}
 					callZone(zone, 'ON');
 				});
 
@@ -29,12 +39,18 @@
 				}
 				function callZone(zone, onOrOff){
 					console.log(zone);
-					clearZones();
 					$.ajax({
 						type: 'GET',
 						url: '/'+zone+'/'+onOrOff,
 						success: function(){
-							$("#Zone"+zone).addClass('turnedON');
+							clearZones();
+							console.log("ZONE" + zone + " response");
+							if(onOrOff==="ON"){
+								$("#Zone"+zone).addClass('turnedON');
+							}
+							else {
+								$("#Zone".zone).removeClass('turnedON');
+							}
 						}
 					});
 
