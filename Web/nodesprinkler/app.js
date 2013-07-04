@@ -1,0 +1,59 @@
+var 	http = require("http"),
+	url = require('url'),
+	path = require('path'),
+	fs = require('fs');
+
+
+
+function onRequest(request, response){
+	callback = function(response){
+		var str = '';
+		//another chunk of data has been recieved, so append it to `str`
+		response.on('data', function (chunk) {
+		  str += chunk;
+		});
+
+		//the whole response has been recieved, so we just print it out here
+		response.on('end', function () {
+		  console.log(str);
+		});
+
+	};
+	var uri = url.parse(request.url).pathname;
+	console.log(uri);
+	var filename = path.join(process.cwd(), uri);
+	if(uri === "/"){filename = path.join(process.cwd(), "sprinkler.html")};
+	console.log(filename);
+
+	path.exists(filename, function(exists) {
+	if(!exists) {
+		var options={
+			host: '192.168.1.237',
+			path: uri
+		}
+		http.request(options, callback).end();	
+		console.log("not exists: " + filename);
+		response.writeHead(200, {'Content-Type': 'text/plain'});
+		response.write('404 Not Found\n');
+		response.end();
+		return;
+		}
+	else{
+		response.writeHead(200, {'Content-Type':'text/html'});
+		var fileStream = fs.createReadStream(filename);
+		fileStream.on('data', function (data) {
+			response.write(data);
+		});
+		fileStream.on('end', function() {
+			response.end();
+		});
+		console.log('done');
+		}
+	})
+
+
+
+};
+
+
+http.createServer(onRequest).listen(8888);

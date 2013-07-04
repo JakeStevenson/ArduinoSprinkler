@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<style>
+			.turnedOn{
+				background:#000;
+			}
+		</style>
+		<script src="zepto.min.js"></script>
+		<script>
+			Zepto(function($){
+
+				$("#all").click(function(){
+					callZone('1', 'ON');
+					callZone('2', 'ON');
+					callZone('3', 'ON');
+					callZone('4', 'ON');
+				});
+
+				$(".zoneButton").click(function(){
+					var zone = $(this).val();
+					callZone(zone, 'ON');
+				});
+
+
+				function clearZones(){
+					$(".zoneButton").each(function(){
+						$(this).removeClass('turnedON');
+					});
+				}
+				function callZone(zone, onOrOff){
+					console.log(zone);
+					clearZones();
+					$.ajax({
+						type: 'GET',
+						url: '/'+zone+'/'+onOrOff,
+						success: function(){
+							$("#Zone"+zone).addClass('turnedON');
+						}
+					});
+
+				}
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Run All</h1>
+		<input type="button" id="all" value="Go"/>
+
+		<h1>Sprinklers</h1>
+	 	<input class="zoneButton" type="button" id="Zone1" value="1"/>	
+	 	<input class="zoneButton" type="button" id="Zone2" value="2"/>	
+	 	<input class="zoneButton" type="button" id="Zone3" value="3"/>	
+	 	<input class="zoneButton" type="button" id="Zone4" value="4"/>	
+	</body>
+</html>
