@@ -79,7 +79,7 @@ boolean sendMyPage(char* URL) {
         for(int checkPin = 4; checkPin < 7; checkPin++)
           {
             jsonPin(checkPin);
-            WiServer.print("],[");
+            WiServer.print(",");
           }
         jsonPin(7);
         WiServer.print(']');
@@ -115,11 +115,11 @@ void readPin(int selectedPin)
   Serial.println(inValue);
   
   if(inValue == 0){
-    WiServer.print("1");
+    WiServer.print("0");
   }
 
   if(inValue == 1){
-    WiServer.print("0");
+    WiServer.print("1");
   }
 }
 
