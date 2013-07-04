@@ -1,1 +1,4 @@
 Relays for zones 1-4 wired to arduino pins 4-7
+
+pin 9 is wifi LED
+pin 8 for button input?
