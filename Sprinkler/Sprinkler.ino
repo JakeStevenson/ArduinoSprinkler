@@ -69,25 +69,11 @@ boolean sendMyPage(char* URL) {
           digitalWrite(selectedPin, HIGH);
         }
       }
-      jsonPin(selectedPin);
+      jsonAllPins();
     }
     else
     {
-      if(strncmp(zone, "ALL", 4) == 0)
-      {
-        WiServer.print('[');
-        for(int checkPin = 4; checkPin < 7; checkPin++)
-          {
-            jsonPin(checkPin);
-            WiServer.print(",");
-          }
-        jsonPin(7);
-        WiServer.print(']');
-      }
-      else
-      {
-        jsonPin(selectedPin);
-      }
+      jsonAllPins();
     }
 
     // URL was recognized
@@ -96,15 +82,26 @@ boolean sendMyPage(char* URL) {
   // URL not found
   //return false;
 }
-
+void jsonAllPins()
+{
+  WiServer.print("{\"zones\":");
+  WiServer.print("[");
+  for(int checkPin = 4; checkPin < 7; checkPin++)
+  {
+    jsonPin(checkPin);
+    WiServer.print(",");
+  }
+  jsonPin(7);
+  WiServer.print("]}");
+}
 void jsonPin(int selectedPin)
 {
   int zone = selectedPin-3;
-  WiServer.print("{'zone");
+  WiServer.print("{\"zone");
   WiServer.print(zone);
-  WiServer.print("':");
+  WiServer.print("\":");
   readPin(selectedPin);
-  WiServer.print('}');
+  WiServer.print("}");
 }
 
 void readPin(int selectedPin)
