@@ -3,8 +3,6 @@ var 	http = require("http"),
 	path = require('path'),
 	fs = require('fs');
 
-
-
 function onRequest(request, response){
 	callback = function(callresponse){
 		var str = '';
@@ -19,15 +17,14 @@ function onRequest(request, response){
 		  response.write(str);
 		  response.end();
 		});
-
 	};
+
 	var uri = url.parse(request.url).pathname;
-	console.log(uri);
+	console.log("request: " + uri);
 	var filename = path.join(process.cwd(), uri);
 	if(uri === "/"){filename = path.join(process.cwd(), "sprinkler.html")};
-	console.log(filename);
 
-	path.exists(filename, function(exists) {
+	fs.exists(filename, function(exists) {
 	if(!exists) {
 		var options={
 			host: '192.168.1.237',
