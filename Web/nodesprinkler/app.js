@@ -27,7 +27,10 @@ function onRequest(request, response){
 	fs.exists(filename, function(exists) {
 	if(!exists) {
 		var options={
-			host: '192.168.1.237',
+			//host: '192.168.1.237',
+			//port: 80,
+			host: 'localhost',
+			port: 8000,
 			path: uri
 		}
 		http.request(options, callback).end();	
