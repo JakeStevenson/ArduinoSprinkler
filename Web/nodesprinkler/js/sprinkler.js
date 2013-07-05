@@ -36,7 +36,7 @@ $(function(){
 			url: '/ALL',
 			success: setZones
 		});
-	}, 1000);
+	}, 4000);
 
 	$("#all").click(function(){
 		var minutes = $("#txtMinutes").val() * 60000;
