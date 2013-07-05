@@ -3,6 +3,13 @@ var 	http = require("http"),
 	path = require('path'),
 	fs = require('fs');
 
+/*
+var 	arduinoInfo = {
+		"hostname" : "192.168.1.237",
+		"port" : 80
+	};
+*/
+
 var 	arduinoInfo = {
 		"hostname" : "localhost",
 		"port" : 8000
@@ -29,7 +36,6 @@ function callZone(zone, onOrOff){
 		port: arduinoInfo.port,
 		path: "/" + zone + "/" + onOrOff
 		}
-		console.log(options);
 	http.request(options, callback).end();	
 	return;
 }
@@ -43,23 +49,19 @@ function onRequest(request, response){
 
 		//the whole response has been recieved, so we just print it out here
 		callresponse.on('end', function () {
-		  console.log(str);
 		  response.write(str);
 		  response.end();
 		});
 	};
 
 	var uri = url.parse(request.url).pathname;
-	console.log("request: " + uri);
 	var filename = path.join(process.cwd(), uri);
 	if(uri === "/"){filename = path.join(process.cwd(), "sprinkler.html")};
 
 	fs.exists(filename, function(exists) {
 	if(!exists) {
 		if(uri.indexOf('cycle')>=0){
-			console.log("CYCLE");
 			var time = uri.substring(uri.lastIndexOf("/")+1);
-			console.log(time);
 			cycleZones(time);
 		}
 		else{
@@ -89,5 +91,4 @@ function onRequest(request, response){
 };
 
 
-console.log(arduinoInfo);
 http.createServer(onRequest).listen(8888);
