@@ -26,12 +26,11 @@ var zones = {"zones": [
 
 function onRequest(request, response){
 	var uri = url.parse(request.url).pathname;
-	console.log("uri:" + uri);
+	console.log("request:" + uri);
 	var pathSet = uri.split('/');
 	if(pathSet.length>2){
 		var zoneToSet = parseInt(pathSet[1])-1;
 		var onOrOff = pathSet[2];
-		console.log('zone to set:' + zoneToSet);
 
 		for(var i=0;i<4;i++){
 			zones.zones[i].status=0;
@@ -43,7 +42,6 @@ function onRequest(request, response){
 		zones.zones[zoneToSet].status = setTo;
 		exec('afplay STICKHIT.WAV');
 	}
-	console.log("request: " + uri);
 	console.log(JSON.stringify(zones));
 	response.write(JSON.stringify(zones));
 	response.end();
