@@ -1,3 +1,7 @@
+var socket = io.connect("/");
+socket.on("zoneChange", function(data){
+	setZones(data);
+});
 function clearZones(){
 	$(".zoneButton").each(function(){
 		$(this).removeClass('btn-inverse');
@@ -5,7 +9,6 @@ function clearZones(){
 }
 function setZones(data){
 	clearZones();
-	console.log('zoneInfo: ' + data);
 	var zoneInfo = $.parseJSON(data);
 	for(var i=0; i< zoneInfo.zones.length;i++){
 		zoneID = zoneInfo.zones[i].id;
@@ -29,15 +32,6 @@ $(function(){
 		success: setZones
 	});
 
-	window.setInterval(function(){
-		console.log('TICK');
-		$.ajax({
-			type: 'GET',
-			url: '/ALL',
-			success: setZones
-		});
-	}, 4000);
-
 	$("#all").click(function(){
 		var minutes = $("#txtMinutes").val() * 60000;
 		$.ajax({
@@ -58,7 +52,6 @@ $(function(){
 	});
 
 	function callZone(zone, onOrOff){
-		console.log(zone);
 		$.ajax({
 			type: 'GET',
 			url: '/'+zone+'/'+onOrOff,
