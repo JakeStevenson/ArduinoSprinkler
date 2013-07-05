@@ -9,21 +9,28 @@
 		</style>
 	</head>
 	<body>
-		<h1>Run All</h1>
-		<input type="textbox" id="txtMinutes" placeholder="minutes" />
-		<input type="button" id="all" value="Go"/>
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span3">
+				<h2>Cycle</h2>
+				<input type="textbox" id="txtMinutes" placeholder="minutes" />
+				<input type="button" class="btn btn-primary" id="all" value="Go"/>
+			</div>
 
-		<h1>Sprinklers</h1>
-	 	<input class="zoneButton" type="button" id="Zone1" value="1"/>	
-	 	<input class="zoneButton" type="button" id="Zone2" value="2"/>	
-	 	<input class="zoneButton" type="button" id="Zone3" value="3"/>	
-	 	<input class="zoneButton" type="button" id="Zone4" value="4"/>	
+			<div class="span7">
+				<h2>Zones</h2>
+				<input class="zoneButton btn" type="button" id="Zone1" value="1"/>	
+				<input class="zoneButton btn" type="button" id="Zone2" value="2"/>	
+				<input class="zoneButton btn" type="button" id="Zone3" value="3"/>	
+				<input class="zoneButton btn" type="button" id="Zone4" value="4"/>	
+			</div>
+		</div>
 		<script src="http://code.jquery.com/jquery.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 		<script>
 			function clearZones(){
 				$(".zoneButton").each(function(){
-					$(this).removeClass('turnedON');
+					$(this).removeClass('btn-inverse');
 				});
 			}
 			function setZones(data){
@@ -35,10 +42,10 @@
 					status = zoneInfo.zones[i].status;
 					zoneButton = $("#Zone"+zoneID);
 					if(status==1){
-						zoneButton.addClass("turnedON");
+						zoneButton.addClass("btn-inverse");
 					}
 					else{
-						zoneButton.removeClass("turnedON");
+						zoneButton.removeClass("btn-inverse");
 					}
 				};
 
@@ -71,7 +78,7 @@
 
 				$(".zoneButton").click(function(){
 					var zone = $(this).val();
-					if($(this).hasClass("turnedON")){
+					if($(this).hasClass("btn-inverse")){
 						callZone(zone, 'OFF');
 						return;
 					}
@@ -89,5 +96,6 @@
 				}
 			});
 		</script>
+	</div>
 	</body>
 </html>
