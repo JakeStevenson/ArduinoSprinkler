@@ -1,4 +1,6 @@
 var 	http = require("http"),
+	app = require("http").createServer(onRequest),
+	io = require("socket.io").listen(app, { log: false }),
 	url = require('url'),
 	path = require('path'),
 	fs = require('fs');
@@ -15,13 +17,24 @@ var 	arduinoInfo = {
 		"port" : 8000
 	};
 
+var socket;
+
 function callZone(zone, onOrOff){
 	var options={
 		host: arduinoInfo.hostname,
 		port: arduinoInfo.port,
 		path: "/" + zone + "/" + onOrOff
 		}
-	http.request(options).end();	
+		http.request(options, function(response){
+			 var str = ''
+			response.on('data', function (chunk) {
+			    str += chunk;
+			});
+
+			response.on('end', function () {
+			    socket.emit("zoneChange", str);
+			});
+		}).end();	
 	return;
 }
 
@@ -96,4 +109,7 @@ function onRequest(request, response){
 };
 
 
-http.createServer(onRequest).listen(8888);
+app.listen(8888);
+io.sockets.on("connection", function(socketin){
+	socket = socketin;
+});
