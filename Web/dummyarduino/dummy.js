@@ -2,6 +2,7 @@ var 	http = require("http"),
 	url = require('url'),
 	path = require('path'),
 	fs = require('fs');
+var exec=require('child_process').exec;
 
 var zones = {"zones": [
 	{
@@ -40,6 +41,7 @@ function onRequest(request, response){
 			setTo = 1;
 		}
 		zones.zones[zoneToSet].status = setTo;
+		exec('afplay STICKHIT.WAV');
 	}
 	console.log("request: " + uri);
 	console.log(JSON.stringify(zones));
