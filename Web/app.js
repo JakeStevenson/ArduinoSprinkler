@@ -18,6 +18,7 @@ var 	arduinoInfo = {
 	};
 
 var socket;
+var timer;
 
 function callZone(zone, onOrOff){
 	var options={
@@ -39,15 +40,16 @@ function callZone(zone, onOrOff){
 }
 
 function cycleZones(time){
+	clearTimeout(timer);
 	//Ghetto chained timeouts!
 	callZone(1, "ON");
-	setTimeout(function(){
+	timer = setTimeout(function(){
 		callZone(2, "ON");
-		setTimeout(function(){
+		timer = setTimeout(function(){
 			callZone(3, "ON");
-			setTimeout(function(){
+			timer = setTimeout(function(){
 				callZone(4, "ON");
-				setTimeout(function(){
+				timer = setTimeout(function(){
 					callZone(4, "OFF");
 				}, time);
 			}, time);
@@ -84,6 +86,8 @@ function onRequest(request, response){
 				cycleZones(time);
 			}
 			else{
+				//If they manually requested something, stop any running cycles
+				clearTimeout(timer);
 				var options={
 					host: arduinoInfo.hostname,
 					port: arduinoInfo.port,
