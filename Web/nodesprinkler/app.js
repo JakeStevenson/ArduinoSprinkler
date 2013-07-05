@@ -3,6 +3,36 @@ var 	http = require("http"),
 	path = require('path'),
 	fs = require('fs');
 
+var 	arduinoInfo = {
+		"hostname" : "localhost",
+		"port" : 8000
+	};
+
+function cycleZones(time){
+	callZone(1, "ON");
+	setTimeout(function(){
+		callZone(2, "ON");
+		setTimeout(function(){
+			callZone(3, "ON");
+			setTimeout(function(){
+				callZone(4, "ON");
+				setTimeout(function(){
+					callZone(4, "OFF");
+				}, time);
+			}, time);
+		}, time);
+	}, time);
+};
+function callZone(zone, onOrOff){
+	var options={
+		host: arduinoInfo.hostname,
+		port: arduinoInfo.port,
+		path: "/" + zone + "/" + onOrOff
+		}
+		console.log(options);
+	http.request(options, callback).end();	
+	return;
+}
 function onRequest(request, response){
 	callback = function(callresponse){
 		var str = '';
@@ -26,26 +56,31 @@ function onRequest(request, response){
 
 	fs.exists(filename, function(exists) {
 	if(!exists) {
-		var options={
-			//host: '192.168.1.237',
-			//port: 80,
-			host: 'localhost',
-			port: 8000,
-			path: uri
+		if(uri.indexOf('cycle')>=0){
+			console.log("CYCLE");
+			var time = uri.substring(uri.lastIndexOf("/")+1);
+			console.log(time);
+			cycleZones(time);
 		}
-		http.request(options, callback).end();	
-		return;
+		else{
+			var options={
+				host: arduinoInfo.hostname,
+				port: arduinoInfo.port,
+				path: uri
+				}
+			http.request(options, callback).end();	
+			return;
+			}
 		}
 	else{
 		response.writeHead(200, {'Content-Type':'text/html'});
 		var fileStream = fs.createReadStream(filename);
 		fileStream.on('data', function (data) {
 			response.write(data);
-		});
+			});
 		fileStream.on('end', function() {
 			response.end();
-		});
-		console.log('done');
+			});
 		}
 	})
 
@@ -54,4 +89,5 @@ function onRequest(request, response){
 };
 
 
+console.log(arduinoInfo);
 http.createServer(onRequest).listen(8888);

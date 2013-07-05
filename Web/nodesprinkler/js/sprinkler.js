@@ -29,21 +29,23 @@ $(function(){
 		success: setZones
 	});
 
+	window.setInterval(function(){
+		console.log('TICK');
+		$.ajax({
+			type: 'GET',
+			url: '/ALL',
+			success: setZones
+		});
+	}, 1000);
+
 	$("#all").click(function(){
 		var minutes = $("#txtMinutes").val() * 60000;
-		callZone('1', 'ON');
-		window.setTimeout(function(){
-			callZone('2', 'ON');
-			window.setTimeout(function(){
-				callZone('3', 'ON');
-				window.setTimeout(function(){
-					callZone('4', 'ON');
-					window.setTimeout(function(){
-						callZone('4', 'OFF');
-					},minutes);
-				}, minutes);
-			}, minutes);
-		}, minutes);
+		$.ajax({
+			type: 'GET',
+			url: '/cycle/'+minutes,
+			success: setZones
+		});
+
 	});
 
 	$(".zoneButton").click(function(){
