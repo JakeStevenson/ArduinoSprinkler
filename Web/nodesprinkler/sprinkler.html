@@ -7,9 +7,34 @@
 		</style>
 		<script src="zepto.min.js"></script>
 		<script>
+			function clearZones(){
+				$(".zoneButton").each(function(){
+					$(this).removeClass('turnedON');
+				});
+			}
+			function setZones(data){
+				clearZones();
+				console.log('zoneInfo: ' + data);
+				var zoneInfo = $.parseJSON(data);
+				debugger;
+				for(var i=0; i< zoneInfo.zones.length;i++){
+					zoneID = zoneInfo.zones[i];
+				};
+
+			};
+
 			Zepto(function($){
+				//Get current sprinkler state in case of refresh
+				$.ajax({
+					type: 'GET',
+					url: '/ALL',
+					success: function(response){
+						setZones(response);
+					}
+				});
 
 				$("#all").click(function(){
+					var minutes = $("#txtMinutes").val() * 60000;
 					callZone('1', 'ON');
 					window.setTimeout(function(){
 						callZone('2', 'ON');
@@ -17,9 +42,9 @@
 							callZone('3', 'ON');
 							window.setTimeout(function(){
 								callZone('4', 'ON');
-							}, 10000);
-						}, 10000);
-					}, 10000);
+							}, minutes);
+						}, minutes);
+					}, minutes);
 				});
 
 				$(".zoneButton").click(function(){
@@ -31,12 +56,6 @@
 					callZone(zone, 'ON');
 				});
 
-
-				function clearZones(){
-					$(".zoneButton").each(function(){
-						$(this).removeClass('turnedON');
-					});
-				}
 				function callZone(zone, onOrOff){
 					console.log(zone);
 					$.ajax({
@@ -60,6 +79,7 @@
 	</head>
 	<body>
 		<h1>Run All</h1>
+		<input type="textbox" id="txtMinutes" placeholder="minutes" />
 		<input type="button" id="all" value="Go"/>
 
 		<h1>Sprinklers</h1>

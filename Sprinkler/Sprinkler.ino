@@ -97,20 +97,20 @@ void jsonAllPins()
 void jsonPin(int selectedPin)
 {
   int zone = selectedPin-3;
-  WiServer.print("{\"zone");
-  WiServer.print(zone);
-  WiServer.print("\":");
-  readPin(selectedPin);
-  WiServer.print("}");
+  String zoneString = String(zone);
+  int status = readPin(selectedPin);
+  String statusString = String(status);
+  WiServer.print("{\"id\":" + zoneString + ",\"status\":" + statusString + "}");
 }
 
-void readPin(int selectedPin)
+int readPin(int selectedPin)
 {
   Serial.println("reading pin");
   //Send back single value
   int inValue = bitRead(PORTD, selectedPin);
   Serial.println(inValue);
   
+  return inValue;
   if(inValue == 0){
     WiServer.print("0");
   }
