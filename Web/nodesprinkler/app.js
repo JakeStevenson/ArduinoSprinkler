@@ -15,7 +15,18 @@ var 	arduinoInfo = {
 		"port" : 8000
 	};
 
+function callZone(zone, onOrOff){
+	var options={
+		host: arduinoInfo.hostname,
+		port: arduinoInfo.port,
+		path: "/" + zone + "/" + onOrOff
+		}
+	http.request(options).end();	
+	return;
+}
+
 function cycleZones(time){
+	//Ghetto chained timeouts!
 	callZone(1, "ON");
 	setTimeout(function(){
 		callZone(2, "ON");
@@ -30,15 +41,6 @@ function cycleZones(time){
 		}, time);
 	}, time);
 };
-function callZone(zone, onOrOff){
-	var options={
-		host: arduinoInfo.hostname,
-		port: arduinoInfo.port,
-		path: "/" + zone + "/" + onOrOff
-		}
-	http.request(options, callback).end();	
-	return;
-}
 function onRequest(request, response){
 	callback = function(callresponse){
 		var str = '';
@@ -56,38 +58,41 @@ function onRequest(request, response){
 
 	var uri = url.parse(request.url).pathname;
 	var filename = path.join(process.cwd(), uri);
+	
+	//Ghetto default route!
 	if(uri === "/"){filename = path.join(process.cwd(), "sprinkler.html")};
 
+	//We look to see if a file matches the request
 	fs.exists(filename, function(exists) {
-	if(!exists) {
-		if(uri.indexOf('cycle')>=0){
-			var time = uri.substring(uri.lastIndexOf("/")+1);
-			cycleZones(time);
-		}
-		else{
-			var options={
-				host: arduinoInfo.hostname,
-				port: arduinoInfo.port,
-				path: uri
-				}
-			http.request(options, callback).end();	
-			return;
+		if(!exists) {
+			//This is not a file request, we consider it an API request
+			if(uri.indexOf('cycle')>=0){
+				var time = uri.substring(uri.lastIndexOf("/")+1);
+				cycleZones(time);
 			}
-		}
-	else{
-		response.writeHead(200, {'Content-Type':'text/html'});
-		var fileStream = fs.createReadStream(filename);
-		fileStream.on('data', function (data) {
-			response.write(data);
-			});
-		fileStream.on('end', function() {
-			response.end();
-			});
-		}
-	})
-
-
-
+			else{
+				var options={
+					host: arduinoInfo.hostname,
+					port: arduinoInfo.port,
+					path: uri
+					}
+				http.request(options, callback).end();	
+				return;
+				}
+			}
+		else{
+			//Spit out the actual file
+			//MIME TYPES IGNORED FOR NOW
+			response.writeHead(200, {'Content-Type':'text/html'});
+			var fileStream = fs.createReadStream(filename);
+			fileStream.on('data', function (data) {
+				response.write(data);
+				});
+			fileStream.on('end', function() {
+				response.end();
+				});
+			}
+		})
 };
 
 
