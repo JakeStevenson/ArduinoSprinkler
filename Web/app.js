@@ -17,9 +17,14 @@ var 	arduinoInfo = {
 		"port" : 8000
 	};
 
-var socket;
+var sockets = [];
 var timer;
 
+function notifyChange(data){
+	for(var i = 0; i< sockets.length; i++){
+	    sockets[i].emit("zoneChange", data);
+	}
+}
 function callZone(zone, onOrOff){
 	var options={
 		host: arduinoInfo.hostname,
@@ -33,7 +38,7 @@ function callZone(zone, onOrOff){
 			});
 
 			response.on('end', function () {
-			    socket.emit("zoneChange", str);
+				notifyChange(str);
 			});
 		}).end();	
 	return;
@@ -66,6 +71,7 @@ function onRequest(request, response){
 
 		//the whole response has been recieved, so we just print it out here
 		callresponse.on('end', function () {
+		  notifyChange(str);
 		  response.write(str);
 		  response.end();
 		});
@@ -113,7 +119,25 @@ function onRequest(request, response){
 };
 
 
+Array.prototype.remove = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+};
+
+
+
 app.listen(8888);
-io.sockets.on("connection", function(socketin){
-	socket = socketin;
+io.sockets.on("connection", function(socket){
+	sockets.push(socket);
+	console.log(sockets.length);
+	socket.on('disconnect', function () {
+		sockets.remove(socket);
+		console.log(sockets.length);
+	});
 });
