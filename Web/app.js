@@ -1,30 +1,13 @@
 var 	http = require("http"),
 	app = require("http").createServer(onRequest),
-	io = require("socket.io").listen(app, { log: false }),
+	sockets = require("./socketcontrol.js").attachTo(app),
+	arduinoInfo = require("./arduinoinfo.js");
 	url = require('url'),
 	path = require('path'),
 	fs = require('fs');
 
-	/*
-var 	arduinoInfo = {
-		"hostname" : "192.168.1.237",
-		"port" : 80
-	};
-	*/
-
-var 	arduinoInfo = {
-		"hostname" : "localhost",
-		"port" : 8000
-	};
-
-var sockets = [];
 var timer;
 
-function notifyChange(data){
-	for(var i = 0; i< sockets.length; i++){
-	    sockets[i].emit("zoneChange", data);
-	}
-}
 function callZone(zone, onOrOff){
 	var options={
 		host: arduinoInfo.hostname,
@@ -38,7 +21,7 @@ function callZone(zone, onOrOff){
 			});
 
 			response.on('end', function () {
-				notifyChange(str);
+				sockets.notifyChange(str);
 			});
 		}).end();	
 	return;
@@ -71,7 +54,7 @@ function onRequest(request, response){
 
 		//the whole response has been recieved, so we just print it out here
 		callresponse.on('end', function () {
-		  notifyChange(str);
+		  sockets.notifyChange(str);
 		  response.write(str);
 		  response.end();
 		});
@@ -90,6 +73,7 @@ function onRequest(request, response){
 			if(uri.indexOf('cycle')>=0){
 				var time = uri.substring(uri.lastIndexOf("/")+1);
 				cycleZones(time);
+				response.end();
 			}
 			else{
 				//If they manually requested something, stop any running cycles
@@ -119,25 +103,5 @@ function onRequest(request, response){
 };
 
 
-Array.prototype.remove = function() {
-    var what, a = arguments, L = a.length, ax;
-    while (L && this.length) {
-        what = a[--L];
-        while ((ax = this.indexOf(what)) !== -1) {
-            this.splice(ax, 1);
-        }
-    }
-    return this;
-};
-
-
 
 app.listen(8888);
-io.sockets.on("connection", function(socket){
-	sockets.push(socket);
-	console.log(sockets.length);
-	socket.on('disconnect', function () {
-		sockets.remove(socket);
-		console.log(sockets.length);
-	});
-});

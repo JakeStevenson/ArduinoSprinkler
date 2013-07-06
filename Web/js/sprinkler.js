@@ -36,10 +36,8 @@ $(function(){
 		var minutes = $("#txtMinutes").val() * 60000;
 		$.ajax({
 			type: 'GET',
-			url: '/cycle/'+minutes,
-			success: setZones
+			url: '/cycle/'+minutes
 		});
-
 	});
 
 	$(".zoneButton").click(function(){
