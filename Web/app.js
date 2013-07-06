@@ -23,7 +23,9 @@ function callZone(zone, onOrOff){
 			response.on('end', function () {
 				sockets.notifyChange(str);
 			});
-		}).end();	
+		})
+		.on("error", function(){console.log('ERROR');})
+		.end();	
 	return;
 }
 
@@ -83,7 +85,9 @@ function onRequest(request, response){
 					port: arduinoInfo.port,
 					path: uri
 					}
-				http.request(options, callback).end();	
+				http.request(options, callback)
+					.on("error", function(){console.log('ERROR');})
+					.end();	
 				return;
 				}
 			}
