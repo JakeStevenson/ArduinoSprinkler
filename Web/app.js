@@ -2,12 +2,14 @@ var 	http = require("http"),
 	app = require("http").createServer(onRequest),
 	io = require("socket.io").listen(app, { log: false }),
 	arduinoInterface = require("./arduinoInterface.js"),
+	schedulemaster = require("./schedulemaster.js"),
 	url = require('url'),
 	path = require('path'),
 	mime = require('mime'),
 	fs = require('fs');
 
 
+//Allow other modules to reach our sockets
 exports.io = io;
 	
 //Basic web server pumps out our files
@@ -45,6 +47,7 @@ io.sockets.on("connection", function(socket){
 		arduinoInterface.checkAll();
 	});
 	socket.on('setZone', function(data){
-		arduinoInterface.setZone(data.zone, data.onOrOff);
+		schedulemaster.runZoneFor(data.zone, 10000);
+		//arduinoInterface.setZone(data.zone, data.onOrOff);
 	});
 });
