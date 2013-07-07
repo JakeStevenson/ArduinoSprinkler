@@ -47,8 +47,13 @@ io.sockets.on("connection", function(socket){
 		arduinoInterface.checkAll();
 	});
 	socket.on('setZone', function(data){
-		schedulemaster.runZoneFor(data.zone, 10000);
-		//arduinoInterface.setZone(data.zone, data.onOrOff);
+		if(data.onOrOff === "OFF"){
+			schedulemaster.turnOffZone(data.zone);
+			arduinoInterface.setZone(data.zone, data.onOrOff);
+		}
+		else{
+			schedulemaster.runZoneFor(data.zone);
+		}
 	});
 	socket.on('cycle', function(data){
 		schedulemaster.runAllZones();

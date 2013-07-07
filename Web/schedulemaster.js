@@ -1,26 +1,33 @@
 var 	schedule = require('node-schedule'),
 	arduinoInterface = require("./arduinoInterface.js");
 
-
-
+var scheduledRequests = [];
 var manualRequest;
 var schedulemaster = exports;
 
+//var run=900000;
+//var pause = 30000;
+var run=5000;
+var pause=1000;
 
-schedulemaster.runZoneFor = function(zone, time){
+schedulemaster.turnOffZone = function(zone){
+	clearCycle();
+	arduinoInterface.setZone(zone, "OFF");
+};
+schedulemaster.runZoneFor = function(zone){
+	clearCycle();
+	scheduledRequests = [];
 	arduinoInterface.setZone(zone, "ON");
-	var endTime = new Date(new Date().getTime() + time);
+	var endTime = new Date(new Date().getTime() + run);
 	manualRequest = schedule.scheduleJob(endTime, function(){
 		arduinoInterface.setZone(zone, "OFF");
 	});
 };
-
 schedulemaster.runAllZones = function(){
-	//var run=900000;
-	//var pause = 30000;
-	var run=5000;
-	var pause=1000;
 
+	clearCycle();
+
+	//Any better way to loop these?
 	var startTime = new Date();
 	var end1 = addTime(startTime, run);
 
@@ -47,12 +54,22 @@ schedulemaster.runAllZones = function(){
 };
 
 function setSchedule(zone, time, onOrOff){
-	manualRequest = schedule.scheduleJob(time, function(){
-		console.log("Zone " + zone + " " + onOrOff);
+	scheduledRequests.push(schedule.scheduleJob(time, function(){
 		arduinoInterface.setZone(zone, onOrOff);
-	});
+	}));
 }
 function addTime(start, time){
 	return new Date(start.getTime() + time);
 };
 
+function clearCycle(){
+	//Clear anything waiting to be turned off.
+	if(manualRequest != undefined){
+		manualRequest.cancel();
+		manualRequest = undefined;
+	};
+	//Interrupt any cycles running
+	for(var i=0; i< scheduledRequests.length; i++){
+		scheduledRequests[i].cancel();
+	}
+};
