@@ -1,4 +1,4 @@
-var 	config = require("./config.js"),
+var 	config = require("./config/config.js"),
 	http = require("http");
 	app = require("./app.js");
 var arduinoInterface = exports;

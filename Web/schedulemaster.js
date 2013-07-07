@@ -1,5 +1,5 @@
 var 	schedule = require('node-schedule'),
-	config = require("./config.js");
+	config = require("./config/config.js");
 	arduinoInterface = require("./arduinoInterface.js");
 
 var scheduledRequests = [];
