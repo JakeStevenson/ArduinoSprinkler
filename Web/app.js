@@ -1,12 +1,12 @@
 var 	http = require("http"),
 	app = require("http").createServer(onRequest),
 	io = require("socket.io").listen(app, { log: false }),
-	arduinoInterface = require("./arduinoInterface.js"),
-	schedulemaster = require("./schedulemaster.js"),
 	url = require('url'),
 	path = require('path'),
 	mime = require('mime'),
-	fs = require('fs');
+	fs = require('fs'),
+	arduinoInterface = require("./arduinoInterface.js"),
+	schedulemaster = require("./schedulemaster.js");
 
 
 //Allow other modules to reach our sockets
@@ -24,17 +24,16 @@ function onRequest(request, response){
 	fs.exists(filename, function(exists) {
 		if(exists) {
 			//Spit out the actual file
-			//MIME TYPES IGNORED FOR NOW
 			response.writeHead(200, {'Content-Type':mime.lookup(filename)});
 			var fileStream = fs.createReadStream(filename);
 			fileStream.on('data', function (data) {
 				response.write(data);
-				});
+			});
 			fileStream.on('end', function() {
 				response.end();
-				});
-			}
-		})
+			});
+		}
+	})
 };
 
 
