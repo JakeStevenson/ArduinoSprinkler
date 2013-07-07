@@ -1,14 +1,11 @@
 var 	schedule = require('node-schedule'),
+	config = require("./config.js");
 	arduinoInterface = require("./arduinoInterface.js");
 
 var scheduledRequests = [];
 var manualRequest;
 var schedulemaster = exports;
 
-//var run=900000;
-//var pause = 30000;
-var run=5000;
-var pause=1000;
 
 schedulemaster.turnOffZone = function(zone){
 	clearCycle();
@@ -18,27 +15,26 @@ schedulemaster.runZoneFor = function(zone){
 	clearCycle();
 	scheduledRequests = [];
 	arduinoInterface.setZone(zone, "ON");
-	var endTime = new Date(new Date().getTime() + run);
+	var endTime = new Date(new Date().getTime() + config.run);
 	manualRequest = schedule.scheduleJob(endTime, function(){
 		arduinoInterface.setZone(zone, "OFF");
 	});
 };
 schedulemaster.runAllZones = function(){
-
 	clearCycle();
 
 	//Any better way to loop these?
 	var startTime = new Date();
-	var end1 = addTime(startTime, run);
+	var end1 = addTime(startTime, config.run);
 
-	var start2 = addTime(end1, pause);
-	var end2 = addTime(start2, run);
+	var start2 = addTime(end1, config.pause);
+	var end2 = addTime(start2, config.run);
 
-	var start3 = addTime(end2, pause);
-	var end3 = addTime(start3, run);
+	var start3 = addTime(end2, config.pause);
+	var end3 = addTime(start3, config.run);
 
-	var start4 = addTime(end3, pause);
-	var end4 = addTime(start4, run);
+	var start4 = addTime(end3, config.pause);
+	var end4 = addTime(start4, config.run);
 
 	setSchedule('1', startTime, "ON");
 	setSchedule('1', end1, "OFF");

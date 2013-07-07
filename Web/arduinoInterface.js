@@ -1,4 +1,4 @@
-var 	arduinoInfo = require("./arduinoinfo.js"),
+var 	config = require("./config.js"),
 	http = require("http");
 	app = require("./app.js");
 var arduinoInterface = exports;
@@ -6,8 +6,8 @@ var arduinoInterface = exports;
 //Basic request to our arduino REST interface
 var arduinoRequest = function (uri, callback){
 	var options={
-		host: arduinoInfo.hostname,
-		port: arduinoInfo.port,
+		host: config.hostname,
+		port: config.port,
 		path: uri
 	}
 	http.request(options, function(response){
