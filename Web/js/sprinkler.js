@@ -1,7 +1,3 @@
-var socket = io.connect("/");
-socket.on("zoneChange", function(data){
-	setZones(data);
-});
 function clearZones(){
 	$(".zoneButton").each(function(){
 		$(this).removeClass('btn-inverse');
@@ -26,19 +22,7 @@ function setZones(data){
 
 $(function(){
 	//Get current sprinkler state in case of refresh
-	$.ajax({
-		type: 'GET',
-		url: '/ALL',
-		success: setZones
-	});
-
-	$("#all").click(function(){
-		var minutes = $("#txtMinutes").val() * 60000;
-		$.ajax({
-			type: 'GET',
-			url: '/cycle/'+minutes
-		});
-	});
+	socket.emit('checkAll');
 
 	$(".zoneButton").click(function(){
 		var zone = $(this).val();
@@ -50,11 +34,12 @@ $(function(){
 	});
 
 	function callZone(zone, onOrOff){
-		$.ajax({
-			type: 'GET',
-			url: '/'+zone+'/'+onOrOff,
-			success: setZones
-		});
-
+		socket.emit('setZone', { zone: zone, onOrOff: onOrOff});
 	}
 });
+
+var socket = io.connect("/");
+socket.on("zoneChange", function(data){
+	setZones(data);
+});
+
