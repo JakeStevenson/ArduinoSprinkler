@@ -4,6 +4,7 @@ var 	http = require("http"),
 	arduinoInterface = require("./arduinoInterface.js"),
 	url = require('url'),
 	path = require('path'),
+	mime = require('mime'),
 	fs = require('fs');
 
 
@@ -20,7 +21,7 @@ function onRequest(request, response){
 		if(exists) {
 			//Spit out the actual file
 			//MIME TYPES IGNORED FOR NOW
-			response.writeHead(200, {'Content-Type':'text/html'});
+			response.writeHead(200, {'Content-Type':mime.lookup(filename)});
 			var fileStream = fs.createReadStream(filename);
 			fileStream.on('data', function (data) {
 				response.write(data);
