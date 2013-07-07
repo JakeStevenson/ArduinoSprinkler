@@ -1,5 +1,6 @@
 var 	arduinoInfo = require("./arduinoinfo.js"),
 	http = require("http");
+	app = require("./app.js");
 var arduinoInterface = exports;
 
 //Basic request to our arduino REST interface
@@ -10,7 +11,7 @@ var arduinoRequest = function (uri, callback){
 		path: uri
 	}
 	http.request(options, function(response){
-		 var str = ''
+		var str = ''
 		response.on('data', function (chunk) {
 		    str += chunk;
 		});
@@ -19,20 +20,25 @@ var arduinoRequest = function (uri, callback){
 			callback(str);
 		});
 	})
-	.on("error", function(){console.log('ERROR');})
+	.on("error", function(error){
+		app.io.sockets.emit("serverError", error);
+	})
 	.end();	
 };
 
 //Set a specific zone
-exports.setZone = function(zone, onOrOff, callback){
+exports.setZone = function(zone, onOrOff){
 	var uri =  "/" + zone + "/" + onOrOff;
 	arduinoRequest(uri, function(response){
-		callback(response);
+		//notify all clients
+		app.io.sockets.emit("zoneChange", response);
 	});
 }
 //Request current zone info
-exports.checkAll = function(callback){
+exports.checkAll = function(){
 	arduinoRequest("/ALL", function(response){
-		callback(response);
+		//notify all clients
+		app.io.sockets.emit("zoneChange", response);
+		app.io.sockets.emit("zoneChange", response);
 	});
 };

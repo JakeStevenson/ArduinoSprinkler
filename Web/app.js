@@ -8,6 +8,8 @@ var 	http = require("http"),
 	fs = require('fs');
 
 
+exports.io = io;
+	
 //Basic web server pumps out our files
 function onRequest(request, response){
 	var uri = url.parse(request.url).pathname;
@@ -40,13 +42,9 @@ app.listen(8888);
 //Wire up socket commands
 io.sockets.on("connection", function(socket){
 	socket.on('checkAll', function(){
-		arduinoInterface.checkAll(function(response){
-			io.sockets.emit("zoneChange", response);
-		});
+		arduinoInterface.checkAll();
 	});
 	socket.on('setZone', function(data){
-		arduinoInterface.setZone(data.zone, data.onOrOff, function(response){
-			io.sockets.emit("zoneChange", response);
-		});
+		arduinoInterface.setZone(data.zone, data.onOrOff);
 	});
 });

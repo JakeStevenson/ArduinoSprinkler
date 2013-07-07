@@ -42,4 +42,8 @@ var socket = io.connect("/");
 socket.on("zoneChange", function(data){
 	setZones(data);
 });
+socket.on("serverError", function(data){
+	debugger;
+	alert("Server error: " + data.code);
+});
 
