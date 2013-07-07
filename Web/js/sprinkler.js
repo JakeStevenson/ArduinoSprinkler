@@ -32,6 +32,9 @@ $(function(){
 		}
 		callZone(zone, 'ON');
 	});
+	$("#RunAll").click(function(){
+		socket.emit("cycle");
+	});
 
 	function callZone(zone, onOrOff){
 		socket.emit('setZone', { zone: zone, onOrOff: onOrOff});

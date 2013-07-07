@@ -39,6 +39,5 @@ exports.checkAll = function(){
 	arduinoRequest("/ALL", function(response){
 		//notify all clients
 		app.io.sockets.emit("zoneChange", response);
-		app.io.sockets.emit("zoneChange", response);
 	});
 };
