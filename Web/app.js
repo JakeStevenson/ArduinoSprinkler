@@ -32,13 +32,11 @@ function onRequest(request, response){
 		})
 };
 
-
-
-function setZone(zone, onOrOff){
+function arduinoRequest(uri, callback){
 	var options={
 		host: arduinoInfo.hostname,
 		port: arduinoInfo.port,
-		path: "/" + zone + "/" + onOrOff
+		path: uri
 		}
 		http.request(options, function(response){
 			 var str = ''
@@ -47,34 +45,26 @@ function setZone(zone, onOrOff){
 			});
 
 			response.on('end', function () {
-				io.sockets.emit("zoneChange", str);
+				callback(str);
 			});
 		})
 		.on("error", function(){console.log('ERROR');})
 		.end();	
-	return;
+};
+function setZone(zone, onOrOff){
+	var uri =  "/" + zone + "/" + onOrOff;
+	arduinoRequest(uri, function(response){
+		io.sockets.emit("zoneChange", response);
+	});
 }
 function checkAll(){
-	var options={
-		host: arduinoInfo.hostname,
-		port: arduinoInfo.port,
-		path: "/ALL"
-		}
-		http.request(options, function(response){
-			 var str = ''
-			response.on('data', function (chunk) {
-			    str += chunk;
-			});
-
-			response.on('end', function () {
-				io.sockets.emit("zoneChange", str);
-			});
-		})
-		.on("error", function(){
-			console.log('ERROR');
-		})
-		.end();	
+	arduinoRequest("/ALL", function(response){
+			io.sockets.emit("zoneChange", response);
+	});
 };
+
+
+//Start our servers
 app.listen(8888);
 io.sockets.on("connection", function(socket){
 	socket.on('checkAll', function(){
