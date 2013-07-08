@@ -6,4 +6,4 @@ exports.port = 8000;
 exports.run = 5000;
 exports.pause = 1000;
 
-exports.schedule = {hour:15, minute:50};
+//exports.schedule = {hour:15, minute:50};
