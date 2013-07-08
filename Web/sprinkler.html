@@ -3,22 +3,40 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 		<title>Sprinkler Control</title>
+		<style>
+			/*Get rid of transition to make my own animation work better*/
+			.progress .bar {
+				-webkit-transition: none;
+				-moz-transition: none;
+				-ms-transition: none;
+				-o-transition: none;
+				transition: none;
+			}
+		</style>
 	</head>
 	<body>
 	<div class="container-fluid">
-		<h2>Zones</h2>
-		<input class="zoneButton btn" type="button" id="Zone1" value="1"/>	
-		<input class="zoneButton btn" type="button" id="Zone2" value="2"/>	
-		<input class="zoneButton btn" type="button" id="Zone3" value="3"/>	
-		<input class="zoneButton btn" type="button" id="Zone4" value="4"/>	
-		<script src="http://code.jquery.com/jquery.js"></script>
-		<script src="js/bootstrap.min.js"></script>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="js/sprinkler.js"></script>
-		</script>
+		<div class="row-fluid">
+			<h2>Zones</h2>
+			<input class="zoneButton btn" type="button" id="Zone1" value="1"/>	
+			<input class="zoneButton btn" type="button" id="Zone2" value="2"/>	
+			<input class="zoneButton btn" type="button" id="Zone3" value="3"/>	
+			<input class="zoneButton btn" type="button" id="Zone4" value="4"/>	
+			<input type="button" class="btn" id="RunAll" value="Run All"/>
+		</div>
 
 
-		<input type="button" class="btn" id="RunAll" value="Run All"/>
+		<div id="zoneProgress" class="row-fluid" style="display:none;">
+			<h2>Progress</h2>
+			<div id="timerProgress" class="progress progress-striped active">
+				<div class="bar" style="width: 0%;"></div>
+			</div>
+		</div>
 	</div>
+
+	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="js/sprinkler.js"></script>
 	</body>
 </html>

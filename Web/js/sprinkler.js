@@ -3,9 +3,34 @@ function clearZones(){
 		$(this).removeClass('btn-inverse');
 	});
 }
+function progressBarFor(zone){
+	if(zone.startTime!=undefined){
+		$("#zoneProgress").show();
+		var startTime = new Date(zone.startTime);
+		var endTime = new Date(new Date(zone.startTime).getTime() + zone.runTime);
+		var bar = $(".bar");
+		var current = new Date();
+		var totalTime = endTime - startTime;
+		var passedTime = current - startTime;
+		var percentage = Math.round((passedTime/totalTime) * 100);
+		bar.width(percentage + '%');
+		bar.html(percentage+'%');
+		if(percentage<100){
+			setTimeout(function(){
+				progressBarFor(zone);
+			}, 10);
+		}
+		else{
+			setTimeout(function(){
+				$("#zoneProgress").hide();
+				bar.width("0%");
+			}, 1000);
+		}
+	}
+};
+
 function setZones(data){
 	clearZones();
-	//var zoneInfo = $.parseJSON(data);
 	var zoneInfo = data;
 	for(var i=0; i< zoneInfo.zones.length;i++){
 		zoneID = zoneInfo.zones[i].id;
@@ -13,6 +38,7 @@ function setZones(data){
 		zoneButton = $("#Zone"+zoneID);
 		if(status==1){
 			zoneButton.addClass("btn-inverse");
+			progressBarFor(zoneInfo.zones[i]);
 		}
 		else{
 			zoneButton.removeClass("btn-inverse");

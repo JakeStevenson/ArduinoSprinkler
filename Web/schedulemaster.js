@@ -23,10 +23,9 @@ function addTimesToArduinoResponse(response){
 			scheduled.startTime = undefined;
 			scheduled.runTime = undefined;
 		}
-		zone.startTime = scheduled.startTinme;
+		zone.startTime = scheduled.startTime;
 		zone.runTime = scheduled.runTime;
 	};
-	console.log(arduinoZones);
 	return arduinoZones;
 };
 
@@ -54,13 +53,9 @@ schedulemaster.runZoneFor = function(zone){
 		app.io.sockets.emit("zoneChange", response);
 	});
 	var endTime = new Date(new Date().getTime() + config.run);
-	scheduledZones.zones[zone-1].startTime = new Date();
-	scheduledZones.zones[zone-1].runTime = config.run;
+	setZoneTime(zone, new Date(), config.run);
 	manualRequest = schedule.scheduleJob(endTime, function(){
-
-		scheduledZones.zones[zone-1].startTime = undefined;
-		scheduledZones.zones[zone-1].runTime = undefined;
-
+		clearZoneTime(zone);
 		arduinoInterface.setZone(zone, "OFF", function(response){
 			response = addTimesToArduinoResponse(response);
 			app.io.sockets.emit("zoneChange", response);
@@ -98,11 +93,22 @@ schedulemaster.runAllZones = function(){
 
 function setSchedule(zone, time, onOrOff){
 	scheduledRequests.push(schedule.scheduleJob(time, function(){
+		if(onOrOff==="ON"){
+			setZoneTime(zone, time , config.run);
+		}
 		arduinoInterface.setZone(zone, onOrOff, function(response){
 			response = addTimesToArduinoResponse(response);
 			app.io.sockets.emit("zoneChange", response);
 		});
 	}));
+}
+function clearZoneTime(zone){
+	scheduledZones.zones[zone-1].startTime = undefined;
+	scheduledZones.zones[zone-1].runTime = undefined;
+}
+function setZoneTime(zone, startTime, runTime){
+	scheduledZones.zones[zone-1].startTime = startTime;
+	scheduledZones.zones[zone-1].runTime = runTime;
 }
 function addTime(start, time){
 	return new Date(start.getTime() + time);
