@@ -8,13 +8,41 @@ var manualRequest;
 var schedulemaster = exports;
 var scheduledZones = {};
 
+//Set up our initial data structure from what's happening on the arduino on startup
+scheduledZones = arduinoInterface.checkAll(function(response){
+	scheduledZones = JSON.parse(response);
+});
+
+function addTimesToArduinoResponse(response){
+	var arduinoZones = JSON.parse(response);
+	for(var i=0;i<arduinoZones.zones.length;i++){
+		zone = arduinoZones.zones[i];
+		scheduled = scheduledZones.zones[i];
+
+		if(zone.status!=1){
+			scheduled.startTime = undefined;
+			scheduled.runTime = undefined;
+		}
+		zone.startTime = scheduled.startTinme;
+		zone.runTime = scheduled.runTime;
+	};
+	console.log(arduinoZones);
+	return arduinoZones;
+};
+
 
 schedulemaster.checkAll = function(callback){
-	arduinoInterface.checkAll(callback);
+	arduinoInterface.checkAll(function(response){
+		response = addTimesToArduinoResponse(response);
+		if(callback){
+			callback(response);
+		};
+	});
 };
 schedulemaster.turnOffZone = function(zone){
 	clearCycle();
 	arduinoInterface.setZone(zone, "OFF", function(response){
+		response = addTimesToArduinoResponse(response);
 		app.io.sockets.emit("zoneChange", response);
 	});
 };
@@ -22,11 +50,19 @@ schedulemaster.runZoneFor = function(zone){
 	clearCycle();
 	scheduledRequests = [];
 	arduinoInterface.setZone(zone, "ON", function(response){
+		response = addTimesToArduinoResponse(response);
 		app.io.sockets.emit("zoneChange", response);
 	});
 	var endTime = new Date(new Date().getTime() + config.run);
+	scheduledZones.zones[zone-1].startTime = new Date();
+	scheduledZones.zones[zone-1].runTime = config.run;
 	manualRequest = schedule.scheduleJob(endTime, function(){
+
+		scheduledZones.zones[zone-1].startTime = undefined;
+		scheduledZones.zones[zone-1].runTime = undefined;
+
 		arduinoInterface.setZone(zone, "OFF", function(response){
+			response = addTimesToArduinoResponse(response);
 			app.io.sockets.emit("zoneChange", response);
 		});
 	});
@@ -63,6 +99,7 @@ schedulemaster.runAllZones = function(){
 function setSchedule(zone, time, onOrOff){
 	scheduledRequests.push(schedule.scheduleJob(time, function(){
 		arduinoInterface.setZone(zone, onOrOff, function(response){
+			response = addTimesToArduinoResponse(response);
 			app.io.sockets.emit("zoneChange", response);
 		});
 	}));

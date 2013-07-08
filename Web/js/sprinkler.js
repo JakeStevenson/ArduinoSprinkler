@@ -5,7 +5,8 @@ function clearZones(){
 }
 function setZones(data){
 	clearZones();
-	var zoneInfo = $.parseJSON(data);
+	//var zoneInfo = $.parseJSON(data);
+	var zoneInfo = data;
 	for(var i=0; i< zoneInfo.zones.length;i++){
 		zoneID = zoneInfo.zones[i].id;
 		status = zoneInfo.zones[i].status;
