@@ -1,23 +1,34 @@
 var 	schedule = require('node-schedule'),
-	config = require("./config/config.js");
-	arduinoInterface = require("./arduinoInterface.js");
+	config = require("./config/config.js"),
+	arduinoInterface = require("./arduinoInterface.js"),
+	app = require("./app.js");
 
 var scheduledRequests = [];
 var manualRequest;
 var schedulemaster = exports;
+var scheduledZones = {};
 
 
+schedulemaster.checkAll = function(callback){
+	arduinoInterface.checkAll(callback);
+};
 schedulemaster.turnOffZone = function(zone){
 	clearCycle();
-	arduinoInterface.setZone(zone, "OFF");
+	arduinoInterface.setZone(zone, "OFF", function(response){
+		app.io.sockets.emit("zoneChange", response);
+	});
 };
 schedulemaster.runZoneFor = function(zone){
 	clearCycle();
 	scheduledRequests = [];
-	arduinoInterface.setZone(zone, "ON");
+	arduinoInterface.setZone(zone, "ON", function(response){
+		app.io.sockets.emit("zoneChange", response);
+	});
 	var endTime = new Date(new Date().getTime() + config.run);
 	manualRequest = schedule.scheduleJob(endTime, function(){
-		arduinoInterface.setZone(zone, "OFF");
+		arduinoInterface.setZone(zone, "OFF", function(response){
+			app.io.sockets.emit("zoneChange", response);
+		});
 	});
 };
 schedulemaster.runAllZones = function(){
@@ -51,7 +62,9 @@ schedulemaster.runAllZones = function(){
 
 function setSchedule(zone, time, onOrOff){
 	scheduledRequests.push(schedule.scheduleJob(time, function(){
-		arduinoInterface.setZone(zone, onOrOff);
+		arduinoInterface.setZone(zone, onOrOff, function(response){
+			app.io.sockets.emit("zoneChange", response);
+		});
 	}));
 }
 function addTime(start, time){

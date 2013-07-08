@@ -43,7 +43,9 @@ app.listen(8888);
 //Wire up socket commands
 io.sockets.on("connection", function(socket){
 	socket.on('checkAll', function(){
-		arduinoInterface.checkAll();
+		schedulemaster.checkAll(function(response){
+			io.sockets.emit("zoneChange", response);
+		});
 	});
 	socket.on('setZone', function(data){
 		if(data.onOrOff === "OFF"){
