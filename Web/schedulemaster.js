@@ -8,6 +8,11 @@ var manualRequest;
 var schedulemaster = exports;
 var scheduledZones = {};
 
+var dailyJob = new schedule.scheduleJob(config.schedule, function(){
+	console.log('Scheduled run!');
+	schedulemaster.runAllZones();
+});
+
 //Set up our initial data structure from what's happening on the arduino on startup
 scheduledZones = arduinoInterface.checkAll(function(response){
 	scheduledZones = JSON.parse(response);
