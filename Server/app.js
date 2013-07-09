@@ -1,6 +1,4 @@
-var 	http = require("http"),
-	httpServer = require("./lib/httpServer.js"),
-	arduinoInterface = require("./lib/arduinoInterface.js"),
+var	httpServer = require("./lib/httpServer.js"),
 	schedulemaster = require("./lib/schedulemaster.js");
 
 //Start http server
