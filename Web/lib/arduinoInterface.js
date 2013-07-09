@@ -1,6 +1,6 @@
-var 	config = require("./config/config.js"),
+var 	config = require("../config/config.js"),
 	http = require("http"),
-	app = require("./app.js");
+	app = require("../app.js");
 var arduinoInterface = exports;
 
 //Basic request to our arduino REST interface
