@@ -39,7 +39,8 @@ socket.on("serverError", function(data){
 socket.on("nextScheduled", function(data){
 	if(data){
 		$("#nextRunView").show();
-		$("#nextRun").html(new Date(data));
+		var nextRun = new Date(data);
+		$("#nextRun").html(nextRun.format());
 	}
 	else{
 		$("#nextRunView").hide();
