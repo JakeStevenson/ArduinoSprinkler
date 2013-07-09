@@ -5,8 +5,7 @@ My Lawn Sprinkler System
 
 
 There are two main projects:
-Controller
-Server
+"Controller" and "Server"
 
 Controller
 =================
