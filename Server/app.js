@@ -38,4 +38,7 @@ io.sockets.on("connection", function(socket){
 	socket.on('cancel', function(data){
 		schedulemaster.cancelAll();
 	});
+	socket.on('showNext', function(){
+		socket.emit('nextScheduled', schedulemaster.nextScheduled());
+	});
 });

@@ -1,4 +1,4 @@
-var 	schedule = require('node-schedule'),
+var 	schedule = require('/Users/jakes/Projects/node-schedule/lib/schedule.js'),
 	config = require("../config/config.js"),
 	arduinoInterface = require("./arduinoInterface.js"),
 	app = require("../app.js");
@@ -13,6 +13,7 @@ var scheduledZones = {};
 if(config.schedule){
 	var dailyJob = new schedule.scheduleJob(config.schedule, function(){
 		schedulemaster.runAllZones();
+		app.io.sockets.emit('nextScheduled', schedulemaster.nextScheduled());
 	});
 }
 
@@ -22,6 +23,12 @@ scheduledZones = arduinoInterface.checkAll(function(response){
 });
 
 //Exports
+schedulemaster.nextScheduled = function(){
+	if(dailyJob){
+		return dailyJob.showNextRun();
+	}
+	return "";
+};
 schedulemaster.checkAll = function(callback){
 	arduinoInterface.checkAll(function(response){
 		response = addTimesToArduinoResponse(response);
