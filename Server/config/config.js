@@ -5,4 +5,4 @@ exports.port = 8000;
 //In milliseconds
 exports.run = 5000;
 
-//exports.schedule = {hour:15, minute:50};
+exports.schedule = {hour:21, minute:0};
