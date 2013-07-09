@@ -37,7 +37,13 @@ socket.on("serverError", function(data){
 	alert("Server error: " + data.code);
 });
 socket.on("nextScheduled", function(data){
-	$("#nextRun").html(new Date(data));
+	if(data){
+		$("#nextRunView").show();
+		$("#nextRun").html(new Date(data));
+	}
+	else{
+		$("#nextRunView").hide();
+	}
 });
 
 //Reset all the buttons to normal
