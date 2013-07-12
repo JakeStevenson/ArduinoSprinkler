@@ -6,6 +6,7 @@ var currentZone;
 $(function(){
 	//Get current sprinkler state in case of refresh
 	socket.emit('checkAll');
+	socket.emit('showNext');
 
 	$(".zoneButton").click(function(){
 		currentZone = $(this).val();
@@ -34,6 +35,16 @@ socket.on("zoneChange", function(data){
 });
 socket.on("serverError", function(data){
 	alert("Server error: " + data.code);
+});
+socket.on("nextScheduled", function(data){
+	if(data){
+		$("#nextRunView").show();
+		var nextRun = new Date(data);
+		$("#nextRun").html(nextRun.format());
+	}
+	else{
+		$("#nextRunView").hide();
+	}
 });
 
 //Reset all the buttons to normal
