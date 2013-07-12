@@ -1,4 +1,4 @@
-var 	schedule = require('/Users/jakes/Projects/node-schedule/lib/schedule.js'),
+var 	schedule = require('node-schedule'),
 	config = require("../config/config.js"),
 	arduinoInterface = require("./arduinoInterface.js"),
 	app = require("../app.js");
