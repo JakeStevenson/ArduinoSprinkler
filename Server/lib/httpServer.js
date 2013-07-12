@@ -10,7 +10,7 @@ exports.server = http.createServer(onRequest).listen(8888);
 var basic = auth({
 	authRealm: "Private area",
 	authFile: path.join(process.cwd(), "htpasswd"),
-	authType: "basic"
+	authType: "digest"
 });
 
 
