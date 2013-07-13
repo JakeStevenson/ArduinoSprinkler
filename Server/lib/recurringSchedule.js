@@ -1,5 +1,6 @@
 var schedule = require('node-schedule');
 var config = require("../config/config.js");
+var app = require("../app.js");
 
 var recurringSchedule = exports;
 

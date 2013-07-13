@@ -22,6 +22,9 @@ $(function(){
 	$("#btnCancel").click(function(){
 		socket.emit("cancel");
 	});
+	$("#btnCancelNext").click(function(){
+		socket.emit("cancelNextRecurring");
+	});
 
 	function callZone(zone, onOrOff){
 		socket.emit('setZone', { zone: zone, onOrOff: onOrOff});

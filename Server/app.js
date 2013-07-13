@@ -41,4 +41,7 @@ io.sockets.on("connection", function(socket){
 	socket.on('showNext', function(){
 		socket.emit('nextScheduled', recurringSchedule.nextScheduled());
 	});
+	socket.on("cancelNextRecurring", function(){
+		recurringSchedule.cancelNext();
+	});
 });
