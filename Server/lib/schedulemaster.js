@@ -8,27 +8,12 @@ var manualRequest;
 var schedulemaster = exports;
 var scheduledZones = {};
 
-//Startup
-//If a daily job is defined in the config, set it up
-if(config.schedule){
-	var dailyJob = new schedule.scheduleJob(config.schedule, function(){
-		schedulemaster.runAllZones();
-		app.io.sockets.emit('nextScheduled', schedulemaster.nextScheduled());
-	});
-}
-
 //Get the initial state from the arduino
 scheduledZones = arduinoInterface.checkAll(function(response){
 	scheduledZones = JSON.parse(response);
 });
 
 //Exports
-schedulemaster.nextScheduled = function(){
-	if(dailyJob){
-		return dailyJob.showNextRun();
-	}
-	return "";
-};
 schedulemaster.checkAll = function(callback){
 	arduinoInterface.checkAll(function(response){
 		response = addTimesToArduinoResponse(response);

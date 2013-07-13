@@ -1,5 +1,6 @@
-var	httpServer = require("./lib/httpServer.js"),
-	schedulemaster = require("./lib/schedulemaster.js");
+var httpServer = require("./lib/httpServer.js");
+var schedulemaster = require("./lib/schedulemaster.js");
+var recurringSchedule = require("./lib/recurringSchedule.js");
 
 //Start http server
 app = httpServer.server;
@@ -38,6 +39,6 @@ io.sockets.on("connection", function(socket){
 	});
 	//Tell UI when the next run will be
 	socket.on('showNext', function(){
-		socket.emit('nextScheduled', schedulemaster.nextScheduled());
+		socket.emit('nextScheduled', recurringSchedule.nextScheduled());
 	});
 });
