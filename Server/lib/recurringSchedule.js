@@ -1,4 +1,5 @@
 var schedule = require('node-schedule');
+var schedulemaster = require("./schedulemaster.js");
 var config = require("../config/config.js");
 var app = require("../app.js");
 
