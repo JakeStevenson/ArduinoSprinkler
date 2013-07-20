@@ -6,7 +6,8 @@
 	"socket.io" 	: "0.9.16",
 	"mime" 		: "1.2.9",
 	"node-schedule" : "0.1.8",
-	"http-auth" 	: "1.2.7"
+	"http-auth" 	: "1.2.7",
+	"forecast.io"	: "*"
 	},
   "scripts" : {
 	"start"		: "nodemon"
