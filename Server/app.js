@@ -1,6 +1,7 @@
 var httpServer = require("./lib/httpServer.js");
 var schedulemaster = require("./lib/schedulemaster.js");
 var recurringSchedule = require("./lib/recurringSchedule.js");
+var weather = require("./lib/weather/weather.js");
 
 //Start http server
 app = httpServer.server;
@@ -13,6 +14,7 @@ exports.io = io;
 
 //Wire up socket commands
 io.sockets.on("connection", function(socket){
+	weather.getForecast();
 	//Status check
 	socket.on('checkAll', function(){
 		schedulemaster.checkAll();

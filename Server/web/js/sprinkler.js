@@ -4,9 +4,10 @@ var currentZone;
 
 //Wire up UI
 $(function(){
+	var skycons = new Skycons();
+	skycons.add("skycon", Skycons.RAIN);
+	skycons.play();
 	//Get current sprinkler state in case of refresh
-	socket.emit('checkAll');
-	socket.emit('showNext');
 
 	$(".zoneButton").click(function(){
 		currentZone = $(this).val();
@@ -29,27 +30,33 @@ $(function(){
 	function callZone(zone, onOrOff){
 		socket.emit('setZone', { zone: zone, onOrOff: onOrOff});
 	}
-});
 
-//Wire up websockets
-var socket = io.connect("/");
-socket.on("zoneChange", function(data){
-	setZones(data);
-});
-socket.on("serverError", function(data){
-	alert("Server error: " + data.code);
-});
-socket.on("nextScheduled", function(data){
-	if(data){
-		$("#nextRunView").show();
-		var nextRun = new Date(data);
-		$("#nextRun").html(nextRun.format());
-	}
-	else{
-		$("#nextRunView").hide();
-	}
-});
+	//Wire up websockets
+	var socket = io.connect("/");
+	socket.emit('checkAll');
+	socket.emit('showNext');
+	socket.on("zoneChange", function(data){
+		setZones(data);
+	});
+	socket.on("serverError", function(data){
+		alert("Server error: " + data.code);
+	});
+	socket.on("nextScheduled", function(data){
+		if(data){
+			$("#nextRunView").show();
+			var nextRun = new Date(data);
+			$("#nextRun").html(nextRun.format());
+		}
+		else{
+			$("#nextRunView").hide();
+		}
+	});
+	socket.on("weatherForecast", function(data){
+		var iconType = data["currently"]["icon"].toUpperCase().replace("-", "_");
+		skycons.set("skycon", Skycons[iconType]);
+	});
 
+});
 //Reset all the buttons to normal
 function clearZoneButtons(){
 	$(".zoneButton").each(function(){

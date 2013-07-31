@@ -12,14 +12,25 @@
 				-o-transition: none;
 				transition: none;
 			}
+			#weather {
+				margin: 0 auto;
+				float: none;
+				text-align: center;
+			}
 		</style>
 	</head>
 	<body>
 	<div class="container-fluid">
 		<div class="row-fluid" id="nextRunView" style="display:none">
-			<h2>Next Full Run</h2>
-			<p class="lead" id="nextRun">None</p>
-			<input class="btn" type="button" id="btnCancelNext" value="Cancel"/>
+			<div class="span4">
+				<h2>Next Full Run</h2>
+				<p class="lead" id="nextRun">None</p>
+				<input class="btn" type="button" id="btnCancelNext" value="Cancel"/>
+			</div>
+			<div class="span4" id="weather">
+				<h2>Weather</h2>
+				<canvas id="skycon"/>
+			</div>
 		</div>
 		<div class="row-fluid">
 			<h2>Zones</h2>
@@ -51,5 +62,6 @@
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="js/sprinkler.js"></script>
 	<script src="js/date.format.js"></script>
+	<script src="js/skycons.js"></script>
 	</body>
 </html>
