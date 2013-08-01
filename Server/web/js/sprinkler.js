@@ -54,6 +54,8 @@ $(function(){
 	socket.on("weatherForecast", function(data){
 		var iconType = data["currently"]["icon"].toUpperCase().replace("-", "_");
 		skycons.set("skycon", Skycons[iconType]);
+		$("#currentWeatherText").html(data["currently"]["summary"]);
+		$("#currentTempText").html(data["currently"]["temperature"]);
 	});
 
 });

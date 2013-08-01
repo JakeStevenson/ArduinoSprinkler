@@ -12,11 +12,6 @@
 				-o-transition: none;
 				transition: none;
 			}
-			#weather {
-				margin: 0 auto;
-				float: none;
-				text-align: center;
-			}
 		</style>
 	</head>
 	<body>
@@ -29,7 +24,15 @@
 			</div>
 			<div class="span4" id="weather">
 				<h2>Weather</h2>
-				<canvas id="skycon"/>
+				<div class="row-fluid">
+					<div class="span3">
+						<canvas id="skycon" width="80" height="80" style="display:inline"></canvas>
+					</div>
+					<div class="span9">
+						<div id="currentTempText"></div>
+						<div id="currentWeatherText"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="row-fluid">
