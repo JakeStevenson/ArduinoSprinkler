@@ -9,8 +9,9 @@ var todayCancelled = false;
 //Startup
 //If a daily job is defined in the config, set it up
 if(config.schedule){
-	var dailyJob = new schedule.scheduleJob(config.schedule, function(){
-		schedulemaster.runAllZones();
+	var dailyJob = new schedule.scheduleJob(config.schedule.at, function(){
+		//Pass in the config array to runZoneTimes
+		schedulemaster.runZoneTimes.apply(undefined, config.schedule.zones);
 		app.io.sockets.emit('nextScheduled', recurringSchedule.nextScheduled());
 	});
 }
