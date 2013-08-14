@@ -9,7 +9,11 @@ var todayCancelled = false;
 //Startup
 //If a daily job is defined in the config, set it up
 if(config.schedule){
-	var dailyJob = new schedule.scheduleJob(config.schedule.at, function(){
+	var rule = new schedule.RecurrenceRule();
+	rule.dayOfWeek = config.schedule.at.dayOfWeek;
+	rule.hour  = config.schedule.at.hour;
+	rule.minute  = config.schedule.at.minute;
+	var dailyJob = new schedule.scheduleJob(rule, function(){
 		//Pass in the config array to runZoneTimes
 		schedulemaster.runZoneTimes.apply(undefined, config.schedule.zones);
 		app.io.sockets.emit('nextScheduled', recurringSchedule.nextScheduled());

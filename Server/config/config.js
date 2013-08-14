@@ -6,6 +6,9 @@ exports.port = 8000;
 exports.run = .1;
 
 exports.schedule = {
-	at: {hour:16, minute:07},
+	at: {
+		hour: [07, 21],
+		minute: 0 
+	},
 	zones: [.2,.1,.1,.1]
 };
