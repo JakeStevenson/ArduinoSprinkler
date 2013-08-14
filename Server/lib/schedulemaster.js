@@ -57,21 +57,24 @@ schedulemaster.cancelAll = function(){
 		schedulemaster.checkAll();
 	});
 };
-schedulemaster.runAllZones = function(){
+schedulemaster.runZoneTimes = function(one, two, three, four){
 	clearSchedule();
 
 	//Any better way to loop these?
 	var startTime = new Date();
-	var start2 = addTime(startTime, config.run);
-	var start3 = addTime(start2, config.run);
-	var start4 = addTime(start3, config.run);
-	var end4 = addTime(start4, config.run);
+	var start2 = addTime(startTime, one * 60000);
+	var start3 = addTime(start2, two * 60000);
+	var start4 = addTime(start3, three * 60000);
+	var end4 = addTime(start4, four * 60000);
 
-	setSchedule('1', startTime, "ON");
-	setSchedule('2', start2, "ON");
-	setSchedule('3', start3, "ON");
-	setSchedule('4', start4, "ON");
+	setSchedule('1', startTime, one * 60000,  "ON");
+	setSchedule('2', start2, two * 60000, "ON");
+	setSchedule('3', start3, three * 60000, "ON");
+	setSchedule('4', start4, four * 60000, "ON");
 	setSchedule('4', end4, "OFF");
+};
+schedulemaster.runAllZones = function(){
+	schedulemaster.runZoneTimes(20,20,20,20);
 };
 
 
@@ -96,10 +99,10 @@ function addTimesToArduinoResponse(response){
 
 
 //Convenience funtion to schedule a job for a zone
-function setSchedule(zone, time, onOrOff){
+function setSchedule(zone, time, runtime, onOrOff){
 	scheduledRequests.push(schedule.scheduleJob(time, function(){
 		if(onOrOff==="ON"){
-			setZoneTime(zone, time , config.run);
+			setZoneTime(zone, time, runtime);
 		}
 		arduinoInterface.setZone(zone, onOrOff, function(response){
 			response = addTimesToArduinoResponse(response);
