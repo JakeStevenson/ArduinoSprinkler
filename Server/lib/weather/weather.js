@@ -2,7 +2,8 @@ var Forecast = require('forecast.io');
 var app = require('../../app.js');
 var schedule = require('../recurringSchedule.js');
 var options = {
-	  APIKey: "SECRET"
+	  APIKey: process.env.WEATHERKEY
+	  //APIKey: "SECRET"
 };
 
 var weather = exports;
