@@ -36,8 +36,8 @@ schedulemaster.runZone = function(zone){
 		response = addTimesToArduinoResponse(response);
 		app.io.sockets.emit("zoneChange", response);
 	});
-	var endTime = new Date(new Date().getTime() + config.run);
-	setZoneTime(zone, new Date(), config.run);
+	var endTime = new Date(new Date().getTime() + config.run * 60000);
+	setZoneTime(zone, new Date(), config.run * 60000);
 	manualRequest = schedule.scheduleJob(endTime, function(){
 		clearZoneTime(zone);
 		arduinoInterface.setZone(zone, "OFF", function(response){
@@ -74,7 +74,8 @@ schedulemaster.runZoneTimes = function(one, two, three, four){
 	setSchedule('4', end4, "OFF");
 };
 schedulemaster.runAllZones = function(){
-	schedulemaster.runZoneTimes(20,20,20,20);
+	//Run each zone for the minutes specified in the config file
+	schedulemaster.runZoneTimes(config.run,config.run,config.run,config.run);
 };
 
 
