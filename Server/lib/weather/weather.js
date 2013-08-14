@@ -1,5 +1,6 @@
 var Forecast = require('forecast.io');
 var app = require('../../app.js');
+var schedule = require('../recurringSchedule.js');
 var options = {
 	  APIKey: "SECRET"
 };
@@ -20,11 +21,18 @@ weather.getForecast = function(){
 
 var fetchForecast = function(){
 	forecast.get(29.7750, -95.6130,function (err, res, data) {
+		console.log("Fetched forecast");
 		fullForecast = data;
 		var precipProbability = data["currently"]["precipProbability"];
 		var precipIntensity = data["currently"]["precipIntensity"];
+		weather.getForecast();
+
+		if(precipProbability==1 && precipIntensity > 0){
+			console.log("Cancelling because of rain.");
+			schedule.cancelNext();
+		}
 	});
 };
 
 fetchForecast();
-setInterval(weather.getForecast, 3600000);
+setInterval(fetchForecast, 3600000);
