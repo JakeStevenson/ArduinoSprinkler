@@ -1,7 +1,8 @@
 var 	schedule = require('node-schedule'),
 	config = require("../config/config.js"),
 	arduinoInterface = require("./arduinoInterface.js"),
-	app = require("../app.js");
+	app = require("../app.js"),
+	progressBar = require('./progress');
 
 var scheduledRequests = [];
 var manualRequest;
@@ -25,6 +26,7 @@ schedulemaster.checkAll = function(callback){
 };
 schedulemaster.turnOffZone = function(zone){
 	clearSchedule();
+	progressBar.cancelBar();
 	arduinoInterface.setZone(zone, "OFF", function(response){
 		response = addTimesToArduinoResponse(response);
 		app.io.sockets.emit("zoneChange", response);
@@ -38,6 +40,7 @@ schedulemaster.runZone = function(zone){
 	});
 	var endTime = new Date(new Date().getTime() + config.run * 60000);
 	setZoneTime(zone, new Date(), config.run * 60000);
+	progressBar.runBar(config.run * 60000, zone);
 	manualRequest = schedule.scheduleJob(endTime, function(){
 		clearZoneTime(zone);
 		arduinoInterface.setZone(zone, "OFF", function(response){
@@ -104,6 +107,7 @@ function setSchedule(zone, time, runtime, onOrOff){
 	scheduledRequests.push(schedule.scheduleJob(time, function(){
 		if(onOrOff==="ON"){
 			setZoneTime(zone, time, runtime);
+			progressBar.runBar(runtime, zone);
 		}
 		arduinoInterface.setZone(zone, onOrOff, function(response){
 			response = addTimesToArduinoResponse(response);
