@@ -74,7 +74,7 @@ schedulemaster.runZoneTimes = function(one, two, three, four){
 	setSchedule('2', start2, two * 60000, "ON");
 	setSchedule('3', start3, three * 60000, "ON");
 	setSchedule('4', start4, four * 60000, "ON");
-	setSchedule('4', end4, "OFF");
+	setSchedule('4', end4, "", "OFF");
 };
 schedulemaster.runAllZones = function(){
 	//Run each zone for the minutes specified in the config file
