@@ -23,7 +23,7 @@ if(config.schedule){
 //Exports
 recurringSchedule.nextScheduled = function(){
 	if(dailyJob){
-		return dailyJob.showNextRun();
+		return dailyJob.nextInvocation();
 	}
 	return "";
 };
