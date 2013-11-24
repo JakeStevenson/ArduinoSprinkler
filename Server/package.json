@@ -9,7 +9,7 @@
     "http-auth": "*",
     "forecast.io": "*",
     "progress": "*",
-    "node-localstorage": "~0.3.4"
+    "node-localstorage": "~0.3.4",
   },
   "scripts": {
     "start": "nodemon"

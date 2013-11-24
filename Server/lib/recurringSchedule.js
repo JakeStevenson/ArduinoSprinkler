@@ -1,4 +1,6 @@
-var schedule = require('node-schedule');
+var scheduler = require('node-schedule');
+var storage = require('node-localstorage').LocalStorage;
+var path = require('path');
 var schedulemaster = require("./schedulemaster.js");
 var config = require("../config/config.js");
 var app = require("../app.js");
@@ -8,16 +10,17 @@ var todayCancelled = false;
 
 //Startup
 //If a daily job is defined in the config, set it up
-if(config.schedule){
-	var rule = new schedule.RecurrenceRule();
-	rule.dayOfWeek = config.schedule.at.dayOfWeek;
-	rule.hour  = config.schedule.at.hour;
-	rule.minute  = config.schedule.at.minute;
-	var dailyJob = new schedule.scheduleJob(rule, function(){
+var localStorage = new storage(path.join(process.cwd(), "scratch"));
+var schedule = JSON.parse(localStorage.getItem('schedule'));
+console.log(schedule);
+if(schedule){
+	var dailyJob = scheduler.scheduleJob(schedule[0].cron, function(){
 		//Pass in the config array to runZoneTimes
-		schedulemaster.runZoneTimes.apply(undefined, config.schedule.zones);
-		app.io.sockets.emit('nextScheduled', recurringSchedule.nextScheduled());
+		console.log("Beginning scheduled run");
+		schedulemaster.runZoneTimes.apply(undefined, schedule[0].zones);
+		app.io.sockets.emit('nextScheduled', recurringSchedule.nextScheduled())
 	});
+	debugger;
 }
 
 //Exports
@@ -36,7 +39,7 @@ recurringSchedule.cancelNext = function(){
 			todayCancelled = true;
 			var today = new Date();
 			var resetTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
-			var reset = schedule.scheduleJob(resetTime, function(){
+			var reset = scheduler.scheduleJob(resetTime, function(){
 				todayCancelled = false;
 				console.log("New day, reset scheduling");
 			});
