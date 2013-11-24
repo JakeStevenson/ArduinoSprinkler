@@ -10,7 +10,7 @@ var todayCancelled = false;
 var jobs = [];
 
 //Startup
-//If a daily job is defined in the config, set it up
+//Load cron jobs from localstorage
 var localStorage = new storage(path.join(process.cwd(), "scratch"));
 var storedSchedule = JSON.parse(localStorage.getItem('schedule'));
 console.log(storedSchedule);
@@ -18,8 +18,8 @@ if(storedSchedule){
 	storedSchedule.forEach(function(schedule)
 	{
 		jobs.push(scheduler.scheduleJob(schedule.cron, function(){
-			//Pass in the config array to runZoneTimes
 			console.log("Beginning scheduled run");
+			//Pass in the config array to runZoneTimes
 			schedulemaster.runZoneTimes.apply(undefined, schedule.zones);
 			app.io.sockets.emit('nextScheduled', recurringSchedule.nextScheduled())
 		}));
@@ -29,7 +29,13 @@ if(storedSchedule){
 //Exports
 recurringSchedule.nextScheduled = function(){
 	if(jobs.length>0){
-		return jobs[0].nextInvocation();
+		//Find next actual scheduled
+		var nextInvocations = [];
+		jobs.forEach(function(job){
+			nextInvocations.push(job.nextInvocation());
+		});
+		nextInvocations.sort();
+		return nextInvocations[0];
 	}
 	return "";
 };
