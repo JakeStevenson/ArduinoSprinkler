@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "main": "app.js",
   "dependencies": {
-    "socket.io": "0.9.16",
-    "mime": "1.2.9",
-    "node-schedule": ">= 0.1.12",
-    "http-auth": "1.2.7",
+    "socket.io": "*",
+    "mime": "*",
+    "node-schedule": "*",
+    "http-auth": "*",
     "forecast.io": "*",
-    "progress": "~1.0.0"
+    "progress": "*"
   },
   "scripts": {
     "start": "nodemon"
