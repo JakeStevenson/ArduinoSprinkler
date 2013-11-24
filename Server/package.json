@@ -8,7 +8,8 @@
     "node-schedule": "*",
     "http-auth": "*",
     "forecast.io": "*",
-    "progress": "*"
+    "progress": "*",
+    "node-localstorage": "~0.3.4"
   },
   "scripts": {
     "start": "nodemon"
