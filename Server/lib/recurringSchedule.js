@@ -18,6 +18,10 @@ if(storedSchedule){
 	storedSchedule.forEach(function(schedule)
 	{
 		jobs.push(scheduler.scheduleJob(schedule.cron, function(){
+			if(todayCancelled){
+				console.log("Not running because cancelled today.");
+				return;
+			}
 			console.log("Beginning scheduled run");
 			//Pass in the config array to runZoneTimes
 			schedulemaster.runZoneTimes.apply(undefined, schedule.zones);
@@ -40,19 +44,16 @@ recurringSchedule.nextScheduled = function(){
 	return "";
 };
 
-recurringSchedule.cancelNext = function(){
+recurringSchedule.cancelToday = function(){
 	if(!todayCancelled){
-		if(dailyJob){
-			dailyJob.cancelNext();
-			app.io.sockets.emit('nextScheduled', recurringSchedule.nextScheduled());
-			todayCancelled = true;
-			var today = new Date();
-			var resetTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
-			var reset = scheduler.scheduleJob(resetTime, function(){
-				todayCancelled = false;
-				console.log("New day, reset scheduling");
-			});
-			console.log("Cancelled today, will reset at " + resetTime);
-		}
+		todayCancelled = true;
+		var today = new Date();
+		var resetTime = new Date();
+		resetTime.setDate(today.getDate()+1);
+		var reset = scheduler.scheduleJob(resetTime, function(){
+			todayCancelled = false;
+			console.log("New day, reset scheduling");
+		});
+		console.log("Cancelled today, will reset at " + resetTime);
 	}
 };

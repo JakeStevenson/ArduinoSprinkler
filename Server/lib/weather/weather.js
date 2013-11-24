@@ -29,7 +29,7 @@ var fetchForecast = function(){
 
 		if(precipProbability==1 && precipIntensity > 0){
 			console.log("Cancelling because of rain.");
-			schedule.cancelNext();
+			schedule.cancelToday();
 		}
 	});
 };
