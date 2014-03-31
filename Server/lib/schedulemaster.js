@@ -1,4 +1,4 @@
-var 	schedule = require('node-schedule'),
+var 	later = require('later'),
 	config = require("../config/config.js"),
 	arduinoInterface = require("./arduinoInterface.js"),
 	app = require("../app.js"),
@@ -41,13 +41,13 @@ schedulemaster.runZone = function(zone){
 	var endTime = new Date(new Date().getTime() + config.run * 60000);
 	setZoneTime(zone, new Date(), config.run * 60000);
 	progressBar.runBar(config.run * 60000, zone);
-	manualRequest = schedule.scheduleJob(endTime, function(){
+	manualRequest = setTimeout(function(){
 		clearZoneTime(zone);
 		arduinoInterface.setZone(zone, "OFF", function(response){
 			response = addTimesToArduinoResponse(response);
 			app.io.sockets.emit("zoneChange", response);
 		});
-	});
+	}, config.run * 6000);
 };
 schedulemaster.cancelAll = function(){
 	schedulemaster.checkAll(function(data){
@@ -130,7 +130,7 @@ function addTime(start, time){
 function clearSchedule(){
 	//Clear anything waiting to be turned off.
 	if(manualRequest != undefined){
-		manualRequest.cancel();
+		clearTimeout(manualRequest);
 		manualRequest = undefined;
 	};
 	//Interrupt any cycles running

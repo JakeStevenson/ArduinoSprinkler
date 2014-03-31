@@ -5,11 +5,11 @@
   "dependencies": {
     "socket.io": "*",
     "mime": "*",
-    "node-schedule": "*",
     "http-auth": "*",
     "forecast.io": "*",
     "progress": "*",
     "node-localstorage": "~0.3.4",
+    "later": "~1.1.6"
   },
   "scripts": {
     "start": "nodemon"

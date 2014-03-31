@@ -1,4 +1,4 @@
-var scheduler = require('node-schedule');
+var later = require('later');
 var storage = require('node-localstorage').LocalStorage;
 var path = require('path');
 var schedulemaster = require("./schedulemaster.js");
@@ -14,21 +14,21 @@ var jobs = [];
 var localStorage = new storage(path.join(process.cwd(), "storedSchedule"));
 var storedSchedule = JSON.parse(localStorage.getItem('schedule'));
 
+later.date.localTime();
+
 console.log("Loading schedule from disk: " );
 console.log(storedSchedule);
 if(storedSchedule){
 	storedSchedule.forEach(function(schedule)
 	{
-		jobs.push(scheduler.scheduleJob(schedule.cron, function(){
-			if(todayCancelled){
-				console.log("Not running because cancelled today.");
-				return;
-			}
+		var job = later.parse.cron(schedule.cron);
+		jobs.push(job);
+		var timer = job.setTimeout(function(){
 			console.log("Beginning scheduled run");
 			//Pass in the config array to runZoneTimes
 			schedulemaster.runZoneTimes.apply(undefined, schedule.zones);
-			app.io.sockets.emit('nextScheduled', recurringSchedule.nextScheduled())
-		}));
+			app.io.sockets.emit('nextScheduled', recurringSchedule.nextScheduled());
+		}, job);
 	});
 }
 
@@ -38,7 +38,7 @@ recurringSchedule.nextScheduled = function(){
 		//Find next actual scheduled
 		var nextInvocations = [];
 		jobs.forEach(function(job){
-			nextInvocations.push(job.nextInvocation());
+			nextInvocations.push(job.next(1));
 		});
 		nextInvocations.sort();
 		return nextInvocations[0];
@@ -47,6 +47,7 @@ recurringSchedule.nextScheduled = function(){
 };
 
 recurringSchedule.cancelToday = function(){
+	return;
 	if(!todayCancelled){
 		todayCancelled = true;
 		var today = new Date();
