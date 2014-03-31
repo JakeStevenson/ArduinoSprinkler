@@ -6,8 +6,8 @@ var 	later = require('later'),
 	Q = require('q');
 
 var schedulemaster = exports;
-
-
+var cancelCurrent = function(){};
+var runningTimer;
 
 //Exports
 schedulemaster.checkAll = function(callback){
@@ -19,6 +19,12 @@ schedulemaster.checkAll = function(callback){
 		};
 	});
 };
+schedulemaster.cancelAll = function(){
+	if(cancelCurrent != undefined){
+		cancelCurrent();
+		console.log("Cancelled run.");
+	};
+};
 schedulemaster.runZone = function(zone, minutes){
 	var deferred = Q.defer();
 	var startTime = new Date();
@@ -27,11 +33,22 @@ schedulemaster.runZone = function(zone, minutes){
 		response = addTimesToArduinoResponse(response, startTime, runTime);
 		app.io.sockets.emit("zoneChange", response);
 	});
-	var endTimer = setTimeout(function(){
+	var stopCurrent = function(){
 		arduinoInterface.setZone(zone, "OFF", function(response){
 			response = addTimesToArduinoResponse(response, startTime, runTime);
 			app.io.sockets.emit("zoneChange", response);
 		});
+		clearTimeout(runningTimer);
+		runningTimer = undefined;
+		completeCurrent = function(){};
+	};
+	cancelCurrent = function(){
+		stopCurrent();
+		progressBar.cancelBar();
+		deferred.reject();
+	};
+	runningTimer = setTimeout(function(){
+		stopCurrent();
 		deferred.resolve();
 	}, minutes * config.minuteConversion);
 	progressBar.runBar(minutes * config.minuteConversion, zone);
@@ -68,8 +85,6 @@ function addTimesToArduinoResponse(response, startTime, runTime){
 	return arduinoZones;
 };
 
-
 function addTime(start, time){
 	return new Date(start.getTime() + time);
 };
-
