@@ -2,7 +2,8 @@ var 	later = require('later'),
 	config = require("../config/config.js"),
 	arduinoInterface = require("./arduinoInterface.js"),
 	app = require("../app.js"),
-	progressBar = require('./progress');
+	progressBar = require('./progress'),
+	Q = require('q');
 
 var scheduledRequests = [];
 var manualRequest;
@@ -24,63 +25,39 @@ schedulemaster.checkAll = function(callback){
 		};
 	});
 };
-schedulemaster.turnOffZone = function(zone){
-	clearSchedule();
-	progressBar.cancelBar();
-	arduinoInterface.setZone(zone, "OFF", function(response){
-		response = addTimesToArduinoResponse(response);
-		app.io.sockets.emit("zoneChange", response);
-	});
-};
-schedulemaster.runZone = function(zone){
+schedulemaster.runZone = function(zone, minutes){
+	var deferred = Q.defer();
 	clearSchedule();
 	arduinoInterface.setZone(zone, "ON", function(response){
 		response = addTimesToArduinoResponse(response);
 		app.io.sockets.emit("zoneChange", response);
 	});
-	var endTime = new Date(new Date().getTime() + config.run * 60000);
-	setZoneTime(zone, new Date(), config.run * 60000);
-	progressBar.runBar(config.run * 60000, zone);
-	manualRequest = setTimeout(function(){
+	var endTimer = setTimeout(function(){
 		clearZoneTime(zone);
 		arduinoInterface.setZone(zone, "OFF", function(response){
 			response = addTimesToArduinoResponse(response);
 			app.io.sockets.emit("zoneChange", response);
 		});
-	}, config.run * 6000);
-};
-schedulemaster.cancelAll = function(){
-	schedulemaster.checkAll(function(data){
-		data.zones.forEach(function(zone){
-			if(zone.status===1){
-				schedulemaster.turnOffZone(zone.id);
-			}
-		});
-		clearSchedule();
-		schedulemaster.checkAll();
-	});
+		deferred.resolve();
+	}, minutes * config.minuteConversion);
+	progressBar.runBar(minutes * config.minuteConversion, zone);
+	return deferred.promise;
 };
 schedulemaster.runZoneTimes = function(one, two, three, four){
-	clearSchedule();
-
-	//Any better way to loop these?
-	var startTime = new Date();
-	var start2 = addTime(startTime, one * 60000);
-	var start3 = addTime(start2, two * 60000);
-	var start4 = addTime(start3, three * 60000);
-	var end4 = addTime(start4, four * 60000);
-
-	setSchedule('1', startTime, one * 60000,  "ON");
-	setSchedule('2', start2, two * 60000, "ON");
-	setSchedule('3', start3, three * 60000, "ON");
-	setSchedule('4', start4, four * 60000, "ON");
-	setSchedule('4', end4, "", "OFF");
+	schedulemaster.runZone( '1', one )
+	.then(function(){
+		return schedulemaster.runZone( '2', two);
+	})
+	.then(function(){
+		return schedulemaster.runZone( '3', three);
+	})
+	.then(function(){
+		return schedulemaster.runZone('4', four);
+	});
 };
 schedulemaster.runAllZones = function(){
-	//Run each zone for the minutes specified in the config file
-	schedulemaster.runZoneTimes(config.run,config.run,config.run,config.run);
+	schedulemaster.runZoneTimes(config.defaultrunMinutes,config.defaultrunMinutes, config.defaultrunMinutes, config.defaultrunMinutes);
 };
-
 
 //Arduino code is too dumb to keep up with when a zone was turned on and 
 //	will be turned off.  So we modify the responses and match up
@@ -118,10 +95,6 @@ function setSchedule(zone, time, runtime, onOrOff){
 function clearZoneTime(zone){
 	scheduledZones.zones[zone-1].startTime = undefined;
 	scheduledZones.zones[zone-1].runTime = undefined;
-}
-function setZoneTime(zone, startTime, runTime){
-	scheduledZones.zones[zone-1].startTime = startTime;
-	scheduledZones.zones[zone-1].runTime = runTime;
 }
 function addTime(start, time){
 	return new Date(start.getTime() + time);

@@ -4,7 +4,6 @@ var timer;
 
 exports.runBar = function(timeToRun, zone){
 	exports.cancelBar();
-	debugger
 	var bar = new ProgressBar('[:bar] :percent', {total: timeToRun/100, width: 60});
 	console.log("Running zone " + zone);
 	timer = setInterval(function(){

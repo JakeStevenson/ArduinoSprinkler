@@ -26,7 +26,7 @@ io.sockets.on("connection", function(socket){
 			schedulemaster.turnOffZone(data.zone);
 		}
 		else{
-			schedulemaster.runZone(data.zone);
+			schedulemaster.runZone(data.zone, 1);
 		}
 	});
 

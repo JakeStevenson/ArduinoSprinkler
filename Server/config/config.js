@@ -3,7 +3,8 @@ var arduinoInfo = exports;
 exports.hostname = "localhost";
 exports.port = 8000;
 //In minutes
-exports.run = .1;
+exports.defaultrunMinutes = 1;
+exports.minuteConversion = 6000;
 
 exports.schedule = {
 	at: {

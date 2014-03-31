@@ -23,7 +23,7 @@ if(storedSchedule){
 	{
 		var job = later.parse.cron(schedule.cron);
 		jobs.push(job);
-		var timer = job.setTimeout(function(){
+		var timer = later.setTimeout(function(){
 			console.log("Beginning scheduled run");
 			//Pass in the config array to runZoneTimes
 			schedulemaster.runZoneTimes.apply(undefined, schedule.zones);
@@ -38,7 +38,7 @@ recurringSchedule.nextScheduled = function(){
 		//Find next actual scheduled
 		var nextInvocations = [];
 		jobs.forEach(function(job){
-			nextInvocations.push(job.next(1));
+			nextInvocations.push(later.schedule(job).next(1));
 		});
 		nextInvocations.sort();
 		return nextInvocations[0];

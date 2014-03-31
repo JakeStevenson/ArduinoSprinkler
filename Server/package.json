@@ -9,7 +9,8 @@
     "forecast.io": "*",
     "progress": "*",
     "node-localstorage": "~0.3.4",
-    "later": "~1.1.6"
+    "later": "~1.1.6",
+    "q": "~1.0.1"
   },
   "scripts": {
     "start": "nodemon"
