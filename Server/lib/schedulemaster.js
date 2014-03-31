@@ -5,15 +5,9 @@ var 	later = require('later'),
 	progressBar = require('./progress'),
 	Q = require('q');
 
-var scheduledRequests = [];
-var manualRequest;
 var schedulemaster = exports;
-var scheduledZones = {};
 
-//Get the initial state from the arduino
-scheduledZones = arduinoInterface.checkAll(function(response){
-	scheduledZones = JSON.parse(response);
-});
+
 
 //Exports
 schedulemaster.checkAll = function(callback){
@@ -27,15 +21,15 @@ schedulemaster.checkAll = function(callback){
 };
 schedulemaster.runZone = function(zone, minutes){
 	var deferred = Q.defer();
-	clearSchedule();
+	var startTime = new Date();
+	var runTime = minutes * config.minuteConversion;
 	arduinoInterface.setZone(zone, "ON", function(response){
-		response = addTimesToArduinoResponse(response);
+		response = addTimesToArduinoResponse(response, startTime, runTime);
 		app.io.sockets.emit("zoneChange", response);
 	});
 	var endTimer = setTimeout(function(){
-		clearZoneTime(zone);
 		arduinoInterface.setZone(zone, "OFF", function(response){
-			response = addTimesToArduinoResponse(response);
+			response = addTimesToArduinoResponse(response, startTime, runTime);
 			app.io.sockets.emit("zoneChange", response);
 		});
 		deferred.resolve();
@@ -62,53 +56,20 @@ schedulemaster.runAllZones = function(){
 //Arduino code is too dumb to keep up with when a zone was turned on and 
 //	will be turned off.  So we modify the responses and match up
 //	our internal knowledge
-function addTimesToArduinoResponse(response){
+function addTimesToArduinoResponse(response, startTime, runTime){
 	var arduinoZones = JSON.parse(response);
 	for(var i=0;i<arduinoZones.zones.length;i++){
 		zone = arduinoZones.zones[i];
-		scheduled = scheduledZones.zones[i];
-
-		if(zone.status!=1){
-			scheduled.startTime = undefined;
-			scheduled.runTime = undefined;
+		if(zone.status===1){
+			zone.startTime = startTime;
+			zone.runTime = runTime;
 		}
-		zone.startTime = scheduled.startTime;
-		zone.runTime = scheduled.runTime;
 	};
 	return arduinoZones;
 };
 
 
-//Convenience funtion to schedule a job for a zone
-function setSchedule(zone, time, runtime, onOrOff){
-	scheduledRequests.push(schedule.scheduleJob(time, function(){
-		if(onOrOff==="ON"){
-			setZoneTime(zone, time, runtime);
-			progressBar.runBar(runtime, zone);
-		}
-		arduinoInterface.setZone(zone, onOrOff, function(response){
-			response = addTimesToArduinoResponse(response);
-			app.io.sockets.emit("zoneChange", response);
-		});
-	}));
-}
-function clearZoneTime(zone){
-	scheduledZones.zones[zone-1].startTime = undefined;
-	scheduledZones.zones[zone-1].runTime = undefined;
-}
 function addTime(start, time){
 	return new Date(start.getTime() + time);
 };
 
-function clearSchedule(){
-	//Clear anything waiting to be turned off.
-	if(manualRequest != undefined){
-		clearTimeout(manualRequest);
-		manualRequest = undefined;
-	};
-	//Interrupt any cycles running
-	for(var i=0; i< scheduledRequests.length; i++){
-		scheduledRequests[i].cancel();
-	}
-	scheduledRequests = [];
-};
