@@ -1,6 +1,6 @@
 var storage = require('node-localstorage').LocalStorage;
 
-localStorage = new storage('./scratch');
+localStorage = new storage('./storedSchedule');
 localStorage.setItem('schedule', JSON.stringify(
 	[
 		{

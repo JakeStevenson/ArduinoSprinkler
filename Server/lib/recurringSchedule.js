@@ -11,8 +11,10 @@ var jobs = [];
 
 //Startup
 //Load cron jobs from localstorage
-var localStorage = new storage(path.join(process.cwd(), "scratch"));
+var localStorage = new storage(path.join(process.cwd(), "storedSchedule"));
 var storedSchedule = JSON.parse(localStorage.getItem('schedule'));
+
+console.log("Loading schedule from disk: " );
 console.log(storedSchedule);
 if(storedSchedule){
 	storedSchedule.forEach(function(schedule)
