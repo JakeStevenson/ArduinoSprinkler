@@ -13,6 +13,7 @@ var jobs = [];
 //Load cron jobs from localstorage
 var localStorage = new storage(path.join(process.cwd(), "storedSchedule"));
 var storedSchedule = JSON.parse(localStorage.getItem('schedule'));
+var cancelledTimes = [];
 
 later.date.localTime();
 
@@ -23,11 +24,14 @@ if(storedSchedule){
 	{
 		var job = later.parse.cron(schedule.cron);
 		jobs.push(job);
-		var timer = later.setTimeout(function(){
+		var timer = later.setInterval(function(){
+			var time = later.schedule(job).next(1);
+			if(cancelledTimes.indexOf(time.valueOf())>-1){
+				console.log("Ignore scheduled task-- it was cancelled");
+				return;
+			}
 			console.log("Beginning scheduled run");
-			//Pass in the config array to runZoneTimes
-			schedulemaster.runZoneTimes.apply(undefined, schedule.zones);
-			app.io.sockets.emit('nextScheduled', recurringSchedule.nextScheduled());
+			//schedulemaster.runZoneTimes.apply(undefined, schedule.zones);
 		}, job);
 	});
 }
@@ -38,25 +42,26 @@ recurringSchedule.nextScheduled = function(){
 		//Find next actual scheduled
 		var nextInvocations = [];
 		jobs.forEach(function(job){
-			nextInvocations.push(later.schedule(job).next(1));
+			var nextIndex = 1;
+			var time = later.schedule(job).next(nextIndex);
+			while(cancelledTimes.indexOf(time.valueOf()) > -1){
+				nextIndex++;
+				var allListed = later.schedule(job).next(nextIndex);
+				time = allListed[nextIndex-1];
+			}
+			nextInvocations.push(time);
 		});
 		nextInvocations.sort();
+		var next = nextInvocations[0];
 		return nextInvocations[0];
 	}
 	return "";
 };
 
 recurringSchedule.cancelToday = function(){
+	var nextScheduledJob = recurringSchedule.nextScheduled();
+	cancelledTimes.push(nextScheduledJob.valueOf());
+	var afterCancelled = recurringSchedule.nextScheduled();
+	app.io.sockets.emit("nextScheduled", afterCancelled);
 	return;
-	if(!todayCancelled){
-		todayCancelled = true;
-		var today = new Date();
-		var resetTime = new Date();
-		resetTime.setDate(today.getDate()+1);
-		var reset = scheduler.scheduleJob(resetTime, function(){
-			todayCancelled = false;
-			console.log("New day, reset scheduling");
-		});
-		console.log("Cancelled today, will reset at " + resetTime);
-	}
 };
