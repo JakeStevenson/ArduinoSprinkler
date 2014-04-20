@@ -22,14 +22,19 @@ weather.getForecast = function(){
 var fetchForecast = function(){
 	forecast.get(29.7750, -95.6130,function (err, res, data) {
 		console.log("Fetched forecast");
-		fullForecast = data;
-		var precipProbability = data["currently"]["precipProbability"];
-		var precipIntensity = data["currently"]["precipIntensity"];
-		weather.getForecast();
+		try{
+			fullForecast = data;
+			var precipProbability = data["currently"]["precipProbability"];
+			var precipIntensity = data["currently"]["precipIntensity"];
+			weather.getForecast();
 
-		if(precipProbability==1 && precipIntensity > 0){
-			console.log("Cancelling because of rain.");
-			schedule.cancelToday();
+			if(precipProbability==1 && precipIntensity > 0){
+				console.log("Cancelling because of rain.");
+				schedule.cancelToday();
+			}
+		}
+		catch(ex){
+			console.log("Error getting forecast.");
 		}
 	});
 };
