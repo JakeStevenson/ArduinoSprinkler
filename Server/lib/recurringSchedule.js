@@ -31,7 +31,7 @@ if(storedSchedule){
 				return;
 			}
 			console.log("Beginning scheduled run");
-			//schedulemaster.runZoneTimes.apply(undefined, schedule.zones);
+			schedulemaster.runZoneTimes.apply(undefined, schedule.zones);
 		}, job);
 	});
 }
